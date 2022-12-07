@@ -32,12 +32,21 @@ class PostgresConnect:
         return self.cursor.fetchall()
 
     def select_all_from_table(self, table_name: str) -> List[Tuple[str, ...]]:
-        """Возвращает все значения из переданной таблицы table_name."""
+        """Возвращает все значения из переданной таблицы table_name.""" 
 
         query = sql.SQL("SELECT * FROM {}".format(table_name))
         self.cursor.execute(query)
         
         return self.cursor.fetchall()
+
+    def create_table(self, table_name: str, *args: str):
+        "Создаёт новую таблицу с переданными полями и параметрами полей"
+
+        query = sql.SQL("CREATE TABLE {}({})".format(table_name, ','.join([str(x) for x in args])))
+        self.cursor.execute(query)
+        self.db_connect.commit()
+        print("Таблица успешно создана")
+
         
 
 
@@ -48,3 +57,4 @@ if __name__ == '__main__':
     #print(my_postgres_db.select_columns_from_table('test_table', 'id', 'firstname'))
     #print(my_postgres_db.select_columns_from_table('test_table', 'id', 'age'))
     print(my_postgres_db.select_all_from_table("test_table"))
+    my_postgres_db.create_table("public.testTEST999", "test TEXT, test8 INT")
