@@ -29,7 +29,16 @@ class PostgresConnect:
         )
         self.cursor.execute(query)
 
-        return [el for el in self.cursor]
+        return self.cursor.fetchall()
+
+    def select_all_from_table(self, table_name: str) -> List[Tuple[str, ...]]:
+        """Возвращает все значения из переданной таблицы table_name."""
+
+        query = sql.SQL("SELECT * FROM {}".format(table_name))
+        self.cursor.execute(query)
+        
+        return self.cursor.fetchall()
+        
 
     def insert_in_table(self, table_name: str, **kwargs: str) -> None:
         """
@@ -54,7 +63,7 @@ if __name__ == '__main__':
     # # Тесты функции select_columns_from_table
     # print(my_postgres_db.select_columns_from_table('test_table', 'id', 'firstname'))
     # print(my_postgres_db.select_columns_from_table('test_table', 'id', 'age'))
-
+    
     # Тесты функции insert_in_table
     # my_postgres_db.insert_in_table('test_table', firstname='Sasha3', lastname='Ivanov3', email='sasha3@mail.ru', age='45')
     # my_postgres_db.insert_in_table('test_table', firstname='Sasha2', lastname='Ivanov2', email='sasha2@mail.ru')
@@ -63,3 +72,4 @@ if __name__ == '__main__':
     # my_postgres_db.insert_in_table('test_table')
     # print(my_postgres_db.insert_in_table('test_table', firstname='Sasha', lastname='Ivanov', email='sasha@mail.ru',
     #                                      age='45'))
+
