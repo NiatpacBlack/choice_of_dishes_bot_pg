@@ -1,5 +1,5 @@
 import os
-from contextlib import closing
+from typing import List, Tuple
 
 import psycopg2
 from dotenv import load_dotenv
@@ -20,8 +20,8 @@ class PostgresConnect:
                                            password=self.password, host=self.host)
         self.cursor = self.db_connect.cursor()
 
-    def select_columns_from_table(self, table_name: str, *args: str) -> list[tuple[str, ...], ...]:
-        """"Возвращает список с кортежами, содержащими данные переданных полей из *args из таблицы table_name."""
+    def select_columns_from_table(self, table_name: str, *args: str) -> List[Tuple[str, ...], ...]:
+        """Возвращает список с кортежами, содержащими данные переданных полей из *args из таблицы table_name."""
 
         query = sql.SQL('SELECT {} FROM {}').format(
             sql.SQL(',').join(map(sql.Identifier, args)),
