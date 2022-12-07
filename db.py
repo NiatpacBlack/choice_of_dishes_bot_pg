@@ -9,7 +9,7 @@ load_dotenv()
 
 
 class PostgresConnect:
-    """Класс для работы с базой данных PostgresSQL"""
+    """Класс для работы с базой данных PostgresSQL."""
 
     def __init__(self, dbname, user, password, host):
         self.dbname = dbname
@@ -34,11 +34,9 @@ class PostgresConnect:
     def select_all_from_table(self, table_name: str) -> List[Tuple[str, ...]]:
         """Возвращает все значения из переданной таблицы table_name."""
 
-        query = sql.SQL("SELECT * FROM {}".format(table_name))
-        self.cursor.execute(query)
-        
+        self.cursor.execute('SELECT * FROM {}'.format(table_name))
+
         return self.cursor.fetchall()
-        
 
     def insert_in_table(self, table_name: str, **kwargs: str) -> None:
         """
@@ -60,16 +58,19 @@ if __name__ == '__main__':
     my_postgres_db = PostgresConnect(dbname=os.getenv('DB_NAME'), user=os.getenv('DB_USER'),
                                      password=os.getenv('DB_PASSWORD'), host=os.getenv('DB_HOST'))
 
+    # # Тесты функции select_all_from_table
+    # print(my_postgres_db.select_all_from_table('test_table'))
+
     # # Тесты функции select_columns_from_table
     # print(my_postgres_db.select_columns_from_table('test_table', 'id', 'firstname'))
     # print(my_postgres_db.select_columns_from_table('test_table', 'id', 'age'))
-    
+
     # Тесты функции insert_in_table
-    # my_postgres_db.insert_in_table('test_table', firstname='Sasha3', lastname='Ivanov3', email='sasha3@mail.ru', age='45')
+    # my_postgres_db.insert_in_table('test_table', firstname='Sasha3', lastname='Ivanov3', email='sasha3@mail.ru',
+    #                                age='45')
     # my_postgres_db.insert_in_table('test_table', firstname='Sasha2', lastname='Ivanov2', email='sasha2@mail.ru')
     # my_postgres_db.insert_in_table('test_table', firstname='Sasha4', email='sasha4@mail.ru')
     # my_postgres_db.insert_in_table('test_table', email='sasha5@mail.ru')
     # my_postgres_db.insert_in_table('test_table')
     # print(my_postgres_db.insert_in_table('test_table', firstname='Sasha', lastname='Ivanov', email='sasha@mail.ru',
     #                                      age='45'))
-
