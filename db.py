@@ -32,11 +32,26 @@ class PostgresConnect:
         return self.cursor.fetchall()
 
     def select_all_from_table(self, table_name: str) -> List[Tuple[str, ...]]:
-        """Возвращает все значения из переданной таблицы table_name."""
+        """Возвращает все значения из переданной таблицы table_name.""" 
 
         self.cursor.execute('SELECT * FROM {}'.format(table_name))
 
         return self.cursor.fetchall()
+
+
+
+    def create_table(self, table_name: str, values_pattern: str) -> None:
+        """
+        Создаёт новую таблицу table_name с переданными полями и параметрами полей из values_pattern.
+           
+        Поля и параметры values_pattern передаются по шаблону: "test TEXT, test1 VARCHAR(20), test2 INTEGER". 
+        """
+
+        query = sql.SQL("CREATE TABLE {}({})".format(table_name, values_pattern))
+        self.cursor.execute(query)
+        self.db_connect.commit()
+
+        
 
     def insert_in_table(self, table_name: str, **kwargs: str) -> None:
         """
@@ -54,12 +69,14 @@ class PostgresConnect:
         self.db_connect.commit()
 
 
+
 if __name__ == '__main__':
     my_postgres_db = PostgresConnect(dbname=os.getenv('DB_NAME'), user=os.getenv('DB_USER'),
-                                     password=os.getenv('DB_PASSWORD'), host=os.getenv('DB_HOST'))
+                                     password=os.getenv('DB_PASSWORD'), host=os.getenv('DB_HOST'))    
 
     # # Тесты функции select_all_from_table
     # print(my_postgres_db.select_all_from_table('test_table'))
+
 
     # # Тесты функции select_columns_from_table
     # print(my_postgres_db.select_columns_from_table('test_table', 'id', 'firstname'))
@@ -74,3 +91,4 @@ if __name__ == '__main__':
     # my_postgres_db.insert_in_table('test_table')
     # print(my_postgres_db.insert_in_table('test_table', firstname='Sasha', lastname='Ivanov', email='sasha@mail.ru',
     #                                      age='45'))
+
