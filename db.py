@@ -40,15 +40,13 @@ class PostgresConnect:
         return self.cursor.fetchall()
 
     def create_table(self, table_name: str, *args: str):
-        "Создаёт новую таблицу с переданными полями и параметрами полей"
+        "Создаёт новую таблицу с переданными полями и параметрами полей."
 
         query = sql.SQL("CREATE TABLE {}({})".format(table_name, ','.join([str(x) for x in args])))
         self.cursor.execute(query)
         self.db_connect.commit()
-        print("Таблица успешно создана")
 
         
-
 
 if __name__ == '__main__':
     my_postgres_db = PostgresConnect(dbname=os.getenv('DB_NAME'), user=os.getenv('DB_USER'),
