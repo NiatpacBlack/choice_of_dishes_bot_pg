@@ -39,10 +39,14 @@ class PostgresConnect:
         
         return self.cursor.fetchall()
 
-    def create_table(self, table_name: str, *args: str):
-        "Создаёт новую таблицу с переданными полями и параметрами полей."
+    def create_table(self, table_name: str, values_pattern: str) -> None:
+        """
+        Создаёт новую таблицу table_name с переданными полями и параметрами полей из values_pattern.
+           
+        Поля и параметры values_pattern передаются по шаблону: "test TEXT, test1 VARCHAR(20), test2 INTEGER". 
+        """
 
-        query = sql.SQL("CREATE TABLE {}({})".format(table_name, ','.join([str(x) for x in args])))
+        query = sql.SQL("CREATE TABLE {}({})".format(table_name, values_pattern))
         self.cursor.execute(query)
         self.db_connect.commit()
 
@@ -55,4 +59,4 @@ if __name__ == '__main__':
     #print(my_postgres_db.select_columns_from_table('test_table', 'id', 'firstname'))
     #print(my_postgres_db.select_columns_from_table('test_table', 'id', 'age'))
     print(my_postgres_db.select_all_from_table("test_table"))
-    my_postgres_db.create_table("public.testTEST999", "test TEXT, test8 INT")
+    my_postgres_db.create_table("public.testTEST888", "test TEXT, test8 INT")
