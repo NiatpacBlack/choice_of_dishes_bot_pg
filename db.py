@@ -47,7 +47,7 @@ class PostgresConnect:
         Поля и параметры values_pattern передаются по шаблону: "test TEXT, test1 VARCHAR(20), test2 INTEGER". 
         """
 
-        query = sql.SQL("CREATE TABLE {}({})".format(table_name, values_pattern))
+        query = sql.SQL("CREATE TABLE IF NOT EXISTS {}({})".format(table_name, values_pattern))
         self.cursor.execute(query)
         self.db_connect.commit()
 
