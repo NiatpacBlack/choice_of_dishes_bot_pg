@@ -83,6 +83,27 @@ class PostgresConnect:
     
 
 
+    def update_table_where(self, table_name: str, set_column: str, set_column_value: str, where_pattern: str) -> None:
+        """
+           Обновляет колонну переданную в set_column данными, переданными в set_column_value,
+           при условии переданном в where_pattern.
+
+           where_pattern должен соответствовать sql синтаксису после WHERE:
+           "firstname = 'Sasha'"
+           "id = 25"
+            и тп.  
+        """
+
+        update = sql.SQL("UPDATE {} SET {}={} WHERE {}").format(
+            sql.Identifier(table_name),
+            sql.Identifier(set_column),
+            sql.Literal(set_column_value),
+            sql.SQL(where_pattern)
+        )
+        self.cursor.execute(update)
+        self.db_connect.commit()
+
+
 if __name__ == '__main__':
     my_postgres_db = PostgresConnect(dbname=os.getenv('DB_NAME'), user=os.getenv('DB_USER'),
                                      password=os.getenv('DB_PASSWORD'), host=os.getenv('DB_HOST'))    
@@ -105,3 +126,4 @@ if __name__ == '__main__':
     # print(my_postgres_db.insert_in_table('test_table', firstname='Sasha', lastname='Ivanov', email='sasha@mail.ru',
     #                                      age='45'))
 
+    
