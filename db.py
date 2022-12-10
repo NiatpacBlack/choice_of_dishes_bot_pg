@@ -40,7 +40,7 @@ class PostgresClient:
         return self.cursor.fetchall()
 
     def select_columns_from_table(
-            self, table_name: str, *args: str
+        self, table_name: str, *args: str
     ) -> List[Tuple[str, ...]]:
         """Возвращает список с кортежами, содержащими данные переданных полей из *args из таблицы table_name."""
 
@@ -67,7 +67,9 @@ class PostgresClient:
         Поля и параметры values_pattern передаются по шаблону: "test TEXT, test1 VARCHAR(20), test2 INTEGER".
         """
 
-        self.cursor.execute("CREATE TABLE IF NOT EXISTS {}({})".format(table_name, values_pattern))
+        self.cursor.execute(
+            "CREATE TABLE IF NOT EXISTS {}({})".format(table_name, values_pattern)
+        )
         self.db_connect.commit()
 
     def insert_in_table(self, table_name: str, **kwargs: str) -> None:
@@ -97,11 +99,11 @@ class PostgresClient:
         self.db_connect.commit()
 
     def update_table_where(
-            self,
-            table_name: str,
-            set_column: str,
-            set_column_value: str,
-            where_pattern: str,
+        self,
+        table_name: str,
+        set_column: str,
+        set_column_value: str,
+        where_pattern: str,
     ) -> None:
         """
         Обновляет колонку переданную в set_column данными, переданными в set_column_value,

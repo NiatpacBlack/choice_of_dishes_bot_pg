@@ -49,17 +49,25 @@ def get_all_tables_name_from_db() -> List[Tuple[str]]:
     return postgres_client.select_all_tables_name_from_db()
 
 
-def get_all_categories_name() -> List[Tuple[str]]:
+def get_all_categories_data() -> List[Tuple[str, ...]]:
     """
-    Получает названия всех категорий из таблицы menu_categories.
+    Возвращает кортежи с id и названием категории из таблицы menu_categories.
 
     Вернет пустой список, если не найдет таблицу или категории.
     """
     try:
-        return postgres_client.select_all_from_table('menu_categories')
+        return postgres_client.select_all_from_table("menu_categories")
     except errors.UndefinedTable:
         return []
 
 
+def insert_category_in_table_menu_categories(category_name: str) -> None:
+    """Добавляет переданную строку с названием категории в таблицу category_name."""
+
+    postgres_client.insert_in_table(
+        table_name="menu_categories", name_category=category_name
+    )
+
+
 if __name__ == "__main__":
-    pprint(get_all_categories_name())
+    pprint(get_all_categories_data())
