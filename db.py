@@ -84,45 +84,6 @@ class PostgresClient:
         self.cursor.execute(insert)
         self.db_connect.commit()
 
-    def update_table(
-        self, table_name: str, set_column: str, set_column_value: str
-    ) -> None:
-        """Обновляет колонну переданную в set_column данными, переданными в set_column_value."""
-
-        update = sql.SQL("UPDATE {} SET {}={}").format(
-            sql.Identifier(table_name),
-            sql.Identifier(set_column),
-            sql.Literal(set_column_value),
-        )
-        self.cursor.execute(update)
-        self.db_connect.commit()
-
-    def update_table_where(
-        self,
-        table_name: str,
-        set_column: str,
-        set_column_value: str,
-        where_pattern: str,
-    ) -> None:
-        """
-        Обновляет колонну переданную в set_column данными, переданными в set_column_value,
-        при условии переданном в where_pattern.
-
-        where_pattern должен соответствовать sql синтаксису после WHERE:
-        "firstname = 'Sasha'"
-        "id = 25"
-         и тп.
-        """
-
-        update = sql.SQL("UPDATE {} SET {}={} WHERE {}").format(
-            sql.Identifier(table_name),
-            sql.Identifier(set_column),
-            sql.Literal(set_column_value),
-            sql.SQL(where_pattern),
-        )
-        self.cursor.execute(update)
-        self.db_connect.commit()
-
     def delete_table(self, table_name: str) -> None:
         """Удаляет таблицу table_name из базы данных."""
 
@@ -134,19 +95,6 @@ class PostgresClient:
         self.cursor.execute(query)
         self.db_connect.commit()
 
-    def update_table(
-        self, table_name: str, set_column: str, set_column_value: str
-    ) -> None:
-        """Обновляет колонну переданную в set_column данными, переданными в set_column_value."""
-
-        update = sql.SQL("UPDATE {} SET {}={}").format(
-            sql.Identifier(table_name),
-            sql.Identifier(set_column),
-            sql.Literal(set_column_value),
-        )
-        self.cursor.execute(update)
-        self.db_connect.commit()
-
     def update_table_where(
         self,
         table_name: str,
@@ -155,7 +103,7 @@ class PostgresClient:
         where_pattern: str,
     ) -> None:
         """
-        Обновляет колонну переданную в set_column данными, переданными в set_column_value,
+        Обновляет колонку переданную в set_column данными, переданными в set_column_value,
         при условии переданном в where_pattern.
 
         where_pattern должен соответствовать sql синтаксису после WHERE:
