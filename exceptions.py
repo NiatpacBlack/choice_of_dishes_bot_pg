@@ -1,2 +1,0 @@
-class CantTableError(ValueError):
-    pass
