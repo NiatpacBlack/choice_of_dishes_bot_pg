@@ -169,7 +169,6 @@ class PostgresClientTest(TestCase):
             len(self.postgres_client.select_all_from_table("test_table")), values_count
         )
 
-
     def test_update_table_where(self):
         """Тест функции обновляющей данные в определённой таблице с условием."""
 
@@ -210,7 +209,6 @@ class PostgresClientTest(TestCase):
 
         # Удаляем добавленную тестовую таблицу
         self.postgres_client.delete_table("new_test_table")
-
 
 
 if __name__ == "__main__":

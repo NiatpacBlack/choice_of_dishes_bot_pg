@@ -14,7 +14,7 @@ postgres_client = PostgresClient(
 
 
 def create_table_menu_categories() -> None:
-    """Cоздаёт таблицу menu_categories, в которой будут находиться названия категорий меню."""
+    """Создаёт таблицу menu_categories, в которой будут находиться названия категорий меню."""
 
     postgres_client.create_table(
         "menu_categories",
@@ -23,7 +23,11 @@ def create_table_menu_categories() -> None:
 
 
 def create_table_dishes():
-    """Создаёт таблицу dishes, в которой будут находиться данные о блюдах, связанных с конкретной категорией из menu_categories"""
+    """
+    Создаёт таблицу dishes, в которой будут находиться данные о блюдах.
+
+    Блюда связанны с конкретной категорией из menu_categories.
+    """
 
     postgres_client.create_table(
         "dishes",
