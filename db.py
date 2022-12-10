@@ -95,6 +95,32 @@ class PostgresClient:
         self.cursor.execute(query)
         self.db_connect.commit()
 
+    def update_table_where(
+        self,
+        table_name: str,
+        set_column: str,
+        set_column_value: str,
+        where_pattern: str,
+    ) -> None:
+        """
+        Обновляет колонку переданную в set_column данными, переданными в set_column_value,
+        при условии переданном в where_pattern.
+
+        where_pattern должен соответствовать sql синтаксису после WHERE:
+        "firstname = 'Sasha'"
+        "id = 25"
+         и тп.
+        """
+
+        update = sql.SQL("UPDATE {} SET {}={} WHERE {}").format(
+            sql.Identifier(table_name),
+            sql.Identifier(set_column),
+            sql.Literal(set_column_value),
+            sql.SQL(where_pattern),
+        )
+        self.cursor.execute(update)
+        self.db_connect.commit()
+
     def delete_value_in_table(self, table_name: str, where_pattern: str) -> None:
         """
         Удаляет запись из таблицы table_name которая соответствует введенному паттерну where_pattern.

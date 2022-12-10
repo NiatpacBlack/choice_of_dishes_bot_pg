@@ -170,5 +170,48 @@ class PostgresClientTest(TestCase):
         )
 
 
+    def test_update_table_where(self):
+        """Тест функции обновляющей данные в определённой таблице с условием."""
+
+        # Создаем тестовую таблицу
+        self.postgres_client.create_table(
+            table_name="new_test_table",
+            values_pattern="firstname VARCHAR(50), lastname VARCHAR(50), email VARCHAR(50), age INTEGER",
+        )
+
+        # Добавляем тестовые данные в таблицу
+        self.postgres_client.insert_in_table(
+            table_name="new_test_table",
+            firstname="testtest",
+            lastname="testtest",
+            email="testtest@testmail.ru",
+            age="1224",
+        )
+
+        # Добавляем другие тестовые данные в таблицу
+        self.postgres_client.insert_in_table(
+            table_name="new_test_table",
+            firstname="testtest",
+            lastname="testtest",
+            email="testtest@testmail.ru",
+            age="888",
+        )
+
+        # Обновляем данные столбца в таблице
+        self.postgres_client.update_table_where(
+            "new_test_table", "age", "10", "age=888"
+        )
+
+        # Находим в таблице обновленные данные
+        self.assertEqual(
+            self.postgres_client.select_columns_from_table("new_test_table", "age"),
+            [(1224,), (10,)],
+        )
+
+        # Удаляем добавленную тестовую таблицу
+        self.postgres_client.delete_table("new_test_table")
+
+
+
 if __name__ == "__main__":
     main()
