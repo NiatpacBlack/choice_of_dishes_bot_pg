@@ -2,12 +2,16 @@ from db import create_table
 
 
 def create_table_menu_categories():
+    """Cоздаёт таблицу menu_categories."""
+
     create_table(
         "menu_categories", "category_id SERIAL PRIMARY KEY, name_category VARHCAR(60)"
     )
 
 
 def create_table_dishes():
+    """Создаёт таблицу dishes."""
+
     create_table(
         "dishes",
         """dish_id SERIAL PRIMARY KEY,
