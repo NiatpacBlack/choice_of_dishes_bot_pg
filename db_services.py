@@ -1,8 +1,10 @@
 import os
+from pprint import pprint
+from typing import List, Tuple
 
-from db import PostgresClient
 from dotenv import load_dotenv
 
+from db import PostgresClient, errors
 
 load_dotenv()
 postgres_client = PostgresClient(
@@ -22,7 +24,7 @@ def create_table_menu_categories() -> None:
     )
 
 
-def create_table_dishes():
+def create_table_dishes() -> None:
     """
     Создаёт таблицу dishes, в которой будут находиться данные о блюдах.
 
@@ -41,6 +43,23 @@ def create_table_dishes():
     )
 
 
+def get_all_tables_name_from_db() -> List[Tuple[str]]:
+    """Возвращает список всех таблиц из базы данных в виде картежей с названиями."""
+
+    return postgres_client.select_all_tables_name_from_db()
+
+
+def get_all_categories_name() -> List[Tuple[str]]:
+    """
+    Получает названия всех категорий из таблицы menu_categories.
+
+    Вернет пустой список, если не найдет таблицу или категории.
+    """
+    try:
+        return postgres_client.select_all_from_table('menu_categories')
+    except errors.UndefinedTable:
+        return []
+
+
 if __name__ == "__main__":
-    create_table_menu_categories()
-    create_table_dishes()
+    pprint(get_all_categories_name())

@@ -1,5 +1,7 @@
 from telebot import types
 
+from db_services import get_all_categories_name
+
 
 def get_start_keyboard():
     """Возвращает кнопки выпадающие при старте бота."""
@@ -13,13 +15,14 @@ def get_start_keyboard():
 
 
 def get_menu_keyboard():
-    """Возвращает кнопки с названиями категорий."""
+    """Возвращает кнопки с названиями категорий, если таковые имеются."""
 
-    categories = ...  # get_all_categories()
+    categories = get_all_categories_name()
     keyboard = types.InlineKeyboardMarkup()
-    for category in categories:
-        keyboard.add(types.InlineKeyboardButton(text=category, callback_data=category))
-
+    keyboard.add(types.InlineKeyboardButton(text="Назад", callback_data="Back"))
+    if categories:
+        for category in categories:
+            keyboard.add(types.InlineKeyboardButton(text=category, callback_data=category))
     return keyboard
 
 
@@ -28,6 +31,11 @@ def get_admin_keyboard():
 
     keyboard = types.InlineKeyboardMarkup()
 
+    keyboard.add(
+        types.InlineKeyboardButton(
+            text="Создать меню", callback_data="create_menu"
+        )
+    )
     keyboard.add(
         types.InlineKeyboardButton(
             text="Добавить категорию", callback_data="add_category"

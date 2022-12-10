@@ -138,7 +138,7 @@ class PostgresClientTest(TestCase):
             len(self.postgres_client.select_all_tables_name_from_db()), tables_count
         )
 
-    def test_insert_and_delete_in_table(self):
+    def test_insert_and_delete_value_in_table(self):
         """Тест функции, добавляющей данные в определенную таблицу и функции удаляющей данные из таблицы."""
 
         # Проверяем количество элементов в таблице до добавления
