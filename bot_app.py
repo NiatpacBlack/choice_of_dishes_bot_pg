@@ -13,7 +13,8 @@ from services import (
     get_start_keyboard,
     get_menu_keyboard,
     get_admin_keyboard,
-    add_category_in_menu, add_dish_in_category,
+    add_category_in_menu,
+    add_dish_in_category,
 )
 
 load_dotenv()
@@ -70,12 +71,16 @@ def callback_start(callback):
 
 @bot.callback_query_handler(func=lambda callback: callback.data == "admin")
 def callback_admin(callback):
-    """Выводит функционал администратора при проверке chat_id."""
+    """
+    Выводит функционал администратора если id чата соответствует зарегистрированному админскому id.
 
-    admin_chat_id = os.getenv("ADMIN_CHAT_ID") or '12s34d5d67a89'
-    list_admin_chat_id = [int(chat_id) for chat_id in admin_chat_id.split()]
+    Список id админов берётся из переменной окружения или непосредственно.
+    """
 
-    if callback.message.chat.id in list_admin_chat_id:
+    admin_chat_id = os.getenv("ADMIN_CHAT_ID") or "0000000000"
+    list_admin_chat_id = admin_chat_id.split()
+
+    if str(callback.message.chat.id) in list_admin_chat_id:
         bot.send_message(
             chat_id=callback.message.chat.id,
             text=f"Выберите действие:",
@@ -121,11 +126,11 @@ def callback_add_dish(callback):
     bot.send_message(
         chat_id=callback.message.chat.id,
         text=f"Что-бы добавить блюдо в категорию отправьте боту сообщение:"
-             f"\n<i>'/add_dish название_категории название_блюда цена описание</i>'"
-             f"\n\n<b>Обратите внимание, что название категории или блюда нужно писать через нижнее подчеркивание"
-             f" вместо пробела, иначе блюдо не будет добавлено!</b>"
-             f"\n\nСписок доступных категорий:"
-             f"\n<i>{categories_string if categories_string else 'Доступных категорий нет'}</i>",
+        f"\n<i>'/add_dish название_категории название_блюда цена описание</i>'"
+        f"\n\n<b>Обратите внимание, что название категории или блюда нужно писать через нижнее подчеркивание"
+        f" вместо пробела, иначе блюдо не будет добавлено!</b>"
+        f"\n\nСписок доступных категорий:"
+        f"\n<i>{categories_string if categories_string else 'Доступных категорий нет'}</i>",
         parse_mode="html",
     )
 
