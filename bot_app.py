@@ -72,18 +72,19 @@ def callback_start(callback):
 def callback_admin(callback):
     """Выводит функционал администратора при проверке chat_id."""
 
-    if callback.message.chat.id not in [
-        int(chat_id) for chat_id in os.getenv("ADMIN_CHAT_ID").split()
-    ]:
-        bot.send_message(
-            chat_id=callback.message.chat.id,
-            text=f"Ваш аккаунт не имеет доступа. Обратитесь к менеджеру заведения.",
-        )
-    else:
+    admin_chat_id = os.getenv("ADMIN_CHAT_ID") or '12s34d5d67a89'
+    list_admin_chat_id = [int(chat_id) for chat_id in admin_chat_id.split()]
+
+    if callback.message.chat.id in list_admin_chat_id:
         bot.send_message(
             chat_id=callback.message.chat.id,
             text=f"Выберите действие:",
             reply_markup=get_admin_keyboard(),
+        )
+    else:
+        bot.send_message(
+            chat_id=callback.message.chat.id,
+            text=f"Ваш аккаунт не имеет доступа. Обратитесь к менеджеру заведения.",
         )
 
 
@@ -120,11 +121,11 @@ def callback_add_dish(callback):
     bot.send_message(
         chat_id=callback.message.chat.id,
         text=f"Что-бы добавить блюдо в категорию отправьте боту сообщение:"
-        f"\n<i>'/add_dish название_категории название_блюда цена описание</i>'"
-        f"\n\n<b>Обратите внимание, что название категории или блюда нужно писать через нижнее подчеркивание"
-        f" вместо пробела, иначе блюдо не будет добавлено!</b>"
-        f"\n\nСписок доступных категорий:"
-        f"\n<i>{categories_string if categories_string else 'Доступных категорий нет'}</i>",
+             f"\n<i>'/add_dish название_категории название_блюда цена описание</i>'"
+             f"\n\n<b>Обратите внимание, что название категории или блюда нужно писать через нижнее подчеркивание"
+             f" вместо пробела, иначе блюдо не будет добавлено!</b>"
+             f"\n\nСписок доступных категорий:"
+             f"\n<i>{categories_string if categories_string else 'Доступных категорий нет'}</i>",
         parse_mode="html",
     )
 
