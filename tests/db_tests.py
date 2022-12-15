@@ -9,20 +9,7 @@ load_dotenv()
 
 
 class PostgresClientTest(TestCase):
-    """
-    Тесты методов класса PostgresClient.
-
-    Для работы тестов в базе данных должна быть таблица test_table хотя-бы с 1 строкой с данными.
-    Создать таблицу можно следующим запросом:
-        CREATE TABLE test_table
-    (
-        Id SERIAL PRIMARY KEY,
-        FirstName CHARACTER VARYING(30),
-        LastName CHARACTER VARYING(30),
-        Email CHARACTER VARYING(30),
-        Age INTEGER
-    );
-    """
+    """Тесты методов класса PostgresClient."""
 
     def setUp(self):
         self.postgres_client = PostgresClient(
@@ -30,6 +17,17 @@ class PostgresClientTest(TestCase):
             user=os.getenv("DB_USER"),
             password=os.getenv("DB_PASSWORD"),
             host=os.getenv("DB_HOST"),
+        )
+
+        self.postgres_client.create_table(
+            "test_table",
+            """
+            Id SERIAL PRIMARY KEY,
+            FirstName CHARACTER VARYING(30),
+            LastName CHARACTER VARYING(30),
+            Email CHARACTER VARYING(30),
+            Age INTEGER
+            """,
         )
 
     def test_type_select_all_tables_from_db(self):
@@ -138,7 +136,7 @@ class PostgresClientTest(TestCase):
             len(self.postgres_client.select_all_tables_name_from_db()), tables_count
         )
 
-    def test_insert_and_delete_in_table(self):
+    def test_insert_and_delete_value_in_table(self):
         """Тест функции, добавляющей данные в определенную таблицу и функции удаляющей данные из таблицы."""
 
         # Проверяем количество элементов в таблице до добавления
@@ -168,7 +166,6 @@ class PostgresClientTest(TestCase):
         self.assertEqual(
             len(self.postgres_client.select_all_from_table("test_table")), values_count
         )
-
 
     def test_update_table_where(self):
         """Тест функции обновляющей данные в определённой таблице с условием."""
@@ -210,7 +207,6 @@ class PostgresClientTest(TestCase):
 
         # Удаляем добавленную тестовую таблицу
         self.postgres_client.delete_table("new_test_table")
-
 
 
 if __name__ == "__main__":

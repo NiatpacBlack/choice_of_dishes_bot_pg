@@ -1,8 +1,10 @@
 import os
+from pprint import pprint
+from typing import List, Tuple
 
-from db import PostgresClient
 from dotenv import load_dotenv
 
+from db import PostgresClient, errors
 
 load_dotenv()
 postgres_client = PostgresClient(
@@ -14,7 +16,7 @@ postgres_client = PostgresClient(
 
 
 def create_table_menu_categories() -> None:
-    """Cоздаёт таблицу menu_categories, в которой будут находиться названия категорий меню."""
+    """Создаёт таблицу menu_categories, в которой будут находиться названия категорий меню."""
 
     postgres_client.create_table(
         "menu_categories",
@@ -22,8 +24,12 @@ def create_table_menu_categories() -> None:
     )
 
 
-def create_table_dishes():
-    """Создаёт таблицу dishes, в которой будут находиться данные о блюдах, связанных с конкретной категорией из menu_categories"""
+def create_table_dishes() -> None:
+    """
+    Создаёт таблицу dishes, в которой будут находиться данные о блюдах.
+
+    Блюда связанны с конкретной категорией из menu_categories.
+    """
 
     postgres_client.create_table(
         "dishes",
@@ -37,6 +43,31 @@ def create_table_dishes():
     )
 
 
+def get_all_tables_name_from_db() -> List[Tuple[str]]:
+    """Возвращает список всех таблиц из базы данных в виде картежей с названиями."""
+
+    return postgres_client.select_all_tables_name_from_db()
+
+
+def get_all_categories_data() -> List[Tuple[str, ...]]:
+    """
+    Возвращает кортежи с id и названием категории из таблицы menu_categories.
+
+    Вернет пустой список, если не найдет таблицу или категории.
+    """
+    try:
+        return postgres_client.select_all_from_table("menu_categories")
+    except errors.UndefinedTable:
+        return []
+
+
+def insert_category_in_table_menu_categories(category_name: str) -> None:
+    """Добавляет переданную строку с названием категории в таблицу category_name."""
+
+    postgres_client.insert_in_table(
+        table_name="menu_categories", name_category=category_name
+    )
+
+
 if __name__ == "__main__":
-    create_table_menu_categories()
-    create_table_dishes()
+    pprint(get_all_categories_data())

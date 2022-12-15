@@ -24,7 +24,11 @@ class PostgresClient:
         self.cursor = self.db_connect.cursor()
 
     def select_all_tables_name_from_db(self) -> List[Tuple[str, ...]]:
-        """Выводит список кортежей, содержащий названия всех таблиц из базы данных."""
+        """
+        Выводит список кортежей, содержащий названия всех таблиц из базы данных.
+
+        Или пустой список, если таблиц нет.
+        """
 
         self.cursor.execute(
             """
@@ -63,10 +67,9 @@ class PostgresClient:
         Поля и параметры values_pattern передаются по шаблону: "test TEXT, test1 VARCHAR(20), test2 INTEGER".
         """
 
-        query = sql.SQL(
+        self.cursor.execute(
             "CREATE TABLE IF NOT EXISTS {}({})".format(table_name, values_pattern)
         )
-        self.cursor.execute(query)
         self.db_connect.commit()
 
     def insert_in_table(self, table_name: str, **kwargs: str) -> None:
