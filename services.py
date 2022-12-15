@@ -86,7 +86,10 @@ def add_dish_in_category(message) -> str:
     """
 
     list_message_words = message.text.split()
-    if 6 <= len(list_message_words) <= 2:
-        pass
-    pass
-    # return 'Вы не передали название категории или товара.'
+    if 6 > len(list_message_words) >= 2:
+        category_name = ' '.join(list_message_words[1].split('_'))
+        dish_name = ' '.join(list_message_words[2].split('_'))
+        dish_price = ' '.join(list_message_words[3].split('_'))
+        dish_description = ' '.join(list_message_words[4].split('_'))
+        print(category_name, dish_name, dish_price, dish_description)
+    return "Переданное сообщение на соответствует форме."

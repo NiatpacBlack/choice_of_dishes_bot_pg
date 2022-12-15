@@ -13,7 +13,7 @@ from services import (
     get_start_keyboard,
     get_menu_keyboard,
     get_admin_keyboard,
-    add_category_in_menu,
+    add_category_in_menu, add_dish_in_category,
 )
 
 load_dotenv()
@@ -42,14 +42,10 @@ def add_category(message):
 
 @bot.message_handler(commands=["add_dish"])
 def add_category(message):
-    list_message_words = message.text.split()
-    if len(list_message_words) != 1:
-        answer = list_message_words[1:]
-    else:
-        answer = "Вы не передали название категории."
+    result = add_dish_in_category(message=message)
     bot.send_message(
         chat_id=message.chat.id,
-        text=answer,
+        text=result,
     )
 
 
@@ -119,15 +115,15 @@ def callback_add_dish(callback):
     """Сообщает пользователю в ответном сообщении действия, которые нужно сделать, чтобы добавить новое блюдо."""
 
     categories_string = "\n".join(
-        map(lambda el: str(el)[2:-3], get_all_categories_data())
+        map(lambda el: str(el)[5:-2], get_all_categories_data())
     )
     bot.send_message(
         chat_id=callback.message.chat.id,
         text=f"Что-бы добавить блюдо в категорию отправьте боту сообщение:"
         f"\n<i>'/add_dish название_категории название_блюда цена описание</i>'"
-        f"\n<b>Обратите внимание, что название категории или блюда нужно писать через нижнее подчеркивание"
+        f"\n\n<b>Обратите внимание, что название категории или блюда нужно писать через нижнее подчеркивание"
         f" вместо пробела, иначе блюдо не будет добавлено!</b>"
-        f"\nСписок доступных категорий:"
+        f"\n\nСписок доступных категорий:"
         f"\n<i>{categories_string if categories_string else 'Доступных категорий нет'}</i>",
         parse_mode="html",
     )
