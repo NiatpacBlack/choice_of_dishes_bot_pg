@@ -9,20 +9,7 @@ load_dotenv()
 
 
 class PostgresClientTest(TestCase):
-    """
-    Тесты методов класса PostgresClient.
-
-    Для работы тестов в базе данных должна быть таблица test_table хотя-бы с 1 строкой с данными.
-    Создать таблицу можно следующим запросом:
-        CREATE TABLE test_table
-    (
-        Id SERIAL PRIMARY KEY,
-        FirstName CHARACTER VARYING(30),
-        LastName CHARACTER VARYING(30),
-        Email CHARACTER VARYING(30),
-        Age INTEGER
-    );
-    """
+    """Тесты методов класса PostgresClient."""
 
     def setUp(self):
         self.postgres_client = PostgresClient(
@@ -30,6 +17,17 @@ class PostgresClientTest(TestCase):
             user=os.getenv("DB_USER"),
             password=os.getenv("DB_PASSWORD"),
             host=os.getenv("DB_HOST"),
+        )
+
+        self.postgres_client.create_table(
+            "test_table",
+            """
+            Id SERIAL PRIMARY KEY,
+            FirstName CHARACTER VARYING(30),
+            LastName CHARACTER VARYING(30),
+            Email CHARACTER VARYING(30),
+            Age INTEGER
+            """,
         )
 
     def test_type_select_all_tables_from_db(self):
