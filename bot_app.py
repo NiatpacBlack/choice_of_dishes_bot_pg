@@ -47,7 +47,7 @@ def add_category(message):
 
 
 @bot.message_handler(commands=["add_dish"])
-def add_category(message):
+def add_dish(message):
     """Добавляет полученное по шаблону блюдо в соответствующую категорию меню."""
 
     result = add_dish_in_category(message=message)
