@@ -1,3 +1,5 @@
+from typing import Tuple, List
+
 from telebot import types
 
 from db_services import (
@@ -93,3 +95,9 @@ def add_dish_in_category(message) -> str:
         dish_description = ' '.join(list_message_words[4].split('_'))
         print(category_name, dish_name, dish_price, dish_description)
     return "Переданное сообщение на соответствует форме."
+
+
+def get_nice_categories_format(categories_data: List[Tuple[str, ...]]) -> str:
+    """Преобразует список с данными категорий меню в удобочитаемый строчный формат."""
+
+    return "\n".join(map(lambda category_data: category_data[1], categories_data))

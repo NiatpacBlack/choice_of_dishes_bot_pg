@@ -3,8 +3,11 @@ import os
 from dotenv import load_dotenv
 from telebot import TeleBot
 
+from bot_answers import (
+    cb_admin_answer, cb_create_menu_answer, cb_add_category_answer, cb_add_dish_answer, cb_back_to_start_answer,
+    cb_menu_answer,
+)
 from db_services import (
-    get_all_tables_name_from_db,
     create_table_menu_categories,
     create_table_dishes,
     get_all_categories_data,
@@ -14,8 +17,10 @@ from services import (
     get_menu_keyboard,
     get_admin_keyboard,
     add_category_in_menu,
-    add_dish_in_category,
+    add_dish_in_category, get_nice_categories_format,
 )
+from validators import (
+    admin_chat_id_validator, get_menu_validator, )
 
 load_dotenv()
 bot = TeleBot(os.getenv("BOT_TOKEN"))
@@ -43,6 +48,8 @@ def add_category(message):
 
 @bot.message_handler(commands=["add_dish"])
 def add_category(message):
+    """Добавляет полученное по шаблону блюдо в соответствующую категорию меню."""
+
     result = add_dish_in_category(message=message)
     bot.send_message(
         chat_id=message.chat.id,
@@ -51,57 +58,39 @@ def add_category(message):
 
 
 @bot.callback_query_handler(func=lambda callback: callback.data == "menu")
-def callback_start(callback):
+def callback_menu(callback):
     """Выводит категории меню или сообщение об его отсутствии."""
 
-    all_tables_in_db = get_all_tables_name_from_db()
-
-    if ("menu_categories",) not in all_tables_in_db:
-        bot.send_message(
-            chat_id=callback.message.chat.id,
-            text=f"К сожалению, меню пока не существует. Создайте его из админ-панели.",
-        )
-    else:
-        bot.send_message(
-            chat_id=callback.message.chat.id,
-            text=f"Выберите категорию:",
-            reply_markup=get_menu_keyboard(),
-        )
+    validation_result = get_menu_validator()
+    bot.send_message(
+        chat_id=callback.message.chat.id,
+        text=cb_menu_answer.answer if validation_result else cb_menu_answer.false_answer,
+        reply_markup=get_menu_keyboard() if validation_result else None,
+    )
 
 
 @bot.callback_query_handler(func=lambda callback: callback.data == "admin")
 def callback_admin(callback):
-    """
-    Выводит функционал администратора если id чата соответствует зарегистрированному админскому id.
+    """Выводит функционал администратора если id чата соответствует зарегистрированному админскому id."""
 
-    Список id админов берётся из переменной окружения или непосредственно.
-    """
+    validation_result = admin_chat_id_validator(callback.message.chat.id)
 
-    admin_chat_id = os.getenv("ADMIN_CHAT_ID") or "0000000000"
-    list_admin_chat_id = admin_chat_id.split()
-
-    if str(callback.message.chat.id) in list_admin_chat_id:
-        bot.send_message(
-            chat_id=callback.message.chat.id,
-            text=f"Выберите действие:",
-            reply_markup=get_admin_keyboard(),
-        )
-    else:
-        bot.send_message(
-            chat_id=callback.message.chat.id,
-            text=f"Ваш аккаунт не имеет доступа. Обратитесь к менеджеру заведения.",
-        )
+    bot.send_message(
+        chat_id=callback.message.chat.id,
+        text=cb_admin_answer.answer if validation_result else cb_admin_answer.false_answer,
+        reply_markup=get_admin_keyboard() if validation_result else None,
+    )
 
 
 @bot.callback_query_handler(func=lambda callback: callback.data == "create_menu")
 def callback_create_menu(callback):
-    """Создает пустые таблицы для меню в базе данных."""
+    """При нажатии кнопки 'Создать меню' создает пустые таблицы для меню в бд и уведомит об этом пользователя."""
 
     create_table_menu_categories()
     create_table_dishes()
     bot.send_message(
         chat_id=callback.message.chat.id,
-        text=f"Меню успешно создано, добавьте категории и позиции блюд, чтобы увидеть меню из функционала бота.",
+        text=cb_create_menu_answer.answer,
     )
 
 
@@ -111,37 +100,35 @@ def callback_add_category(callback):
 
     bot.send_message(
         chat_id=callback.message.chat.id,
-        text=f"Что-бы добавить категорию отправьте боту сообщение:\n<i>'/add_category название_категории'</i>",
+        text=cb_add_category_answer.answer,
         parse_mode="html",
     )
 
 
 @bot.callback_query_handler(func=lambda callback: callback.data == "add_dish")
 def callback_add_dish(callback):
-    """Сообщает пользователю в ответном сообщении действия, которые нужно сделать, чтобы добавить новое блюдо."""
+    """
+    Сообщает пользователю в ответном сообщении действия, которые нужно сделать, чтобы добавить новое блюдо.
 
-    categories_string = "\n".join(
-        map(lambda el: str(el)[5:-2], get_all_categories_data())
-    )
+    В ответном сообщении присутствуют текущие доступные категории из меню, чтобы пользователь понимал с чем работать.
+    """
+    categories_data = get_all_categories_data()
+    categories_text = get_nice_categories_format(categories_data) if categories_data else 'Доступных категорий нет'
+
     bot.send_message(
         chat_id=callback.message.chat.id,
-        text=f"Что-бы добавить блюдо в категорию отправьте боту сообщение:"
-        f"\n<i>'/add_dish название_категории название_блюда цена описание</i>'"
-        f"\n\n<b>Обратите внимание, что название категории или блюда нужно писать через нижнее подчеркивание"
-        f" вместо пробела, иначе блюдо не будет добавлено!</b>"
-        f"\n\nСписок доступных категорий:"
-        f"\n<i>{categories_string if categories_string else 'Доступных категорий нет'}</i>",
+        text=cb_add_dish_answer.answer + f"<i>{categories_text}</i>",
         parse_mode="html",
     )
 
 
 @bot.callback_query_handler(func=lambda callback: callback.data == "back_to_start")
-def callback_create_menu(callback):
+def callback_back_to_start(callback):
     """Возвращает пользователя на начальное меню."""
 
     bot.send_message(
         chat_id=callback.message.chat.id,
-        text=f"Выберите действие:",
+        text=cb_back_to_start_answer.answer,
         reply_markup=get_start_keyboard(),
     )
 
