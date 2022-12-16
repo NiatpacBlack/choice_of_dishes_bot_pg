@@ -58,6 +58,18 @@ def create_table_selection_dishes() -> None:
     )
 
 
+def create_table_last_messages() -> None:
+    """Создает таблицу last_messages, в которой будут храниться данные о сообщениях отправленных пользователями боту."""
+
+    postgres_client.create_table(
+        "last_messages",
+        """
+        last_message_id SERIAL PRIMARY KEY,
+           text_message text NOT NULL
+        """
+    )
+
+
 def get_all_tables_name_from_db() -> List[Tuple[str]]:
     """Возвращает список всех таблиц из базы данных в виде картежей с названиями."""
 
@@ -145,5 +157,23 @@ def add_dish_selection_in_selection_dishes_table(user_name: str, dish_id: str, d
     )
 
 
+def add_message_in_last_messages_table(message: str) -> None:
+    """Добавляет строку message в таблицу last_messages."""
+
+    postgres_client.insert_in_table(
+        table_name="last_messages", text_message=message,
+    )
+
+
+def get_last_messages(limit: int = 10) -> List[Tuple[str], ...]:
+    """Получает n-ное количество последних сообщений из таблицы last_messages."""
+
+    query = (
+        f"SELECT text_message FROM last_messages ORDER BY last_message_id DESC LIMIT ({limit})"
+    )
+    postgres_client.cursor.execute(query)
+    return postgres_client.cursor.fetchall()
+
+
 if __name__ == "__main__":
-    pprint(get_all_categories_data())
+    print(get_last_messages())

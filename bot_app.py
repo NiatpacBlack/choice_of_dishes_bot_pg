@@ -15,7 +15,7 @@ from db_services import (
     create_table_menu_categories,
     create_table_dishes,
     get_all_categories_data, get_dish_parameters, create_table_selection_dishes,
-    add_dish_selection_in_selection_dishes_table,
+    add_dish_selection_in_selection_dishes_table, create_table_last_messages, add_message_in_last_messages_table,
 )
 from services import (
     get_start_keyboard,
@@ -86,10 +86,10 @@ def add_dish(message) -> Tuple[int, int]:
 
 
 @bot.message_handler(content_types=['text'])
-def handle_text_message(message):
+def handle_text_message(message) -> None:
     """Отлавливает все текстовые сообщения переданные боту и записывает их в таблицу базы данных."""
 
-    pass
+    add_message_in_last_messages_table(message.text)
 
 
 @bot.callback_query_handler(func=lambda callback: callback.data == "menu")
@@ -129,6 +129,7 @@ def callback_create_menu(callback) -> Tuple[int, int]:
     create_table_menu_categories()
     create_table_dishes()
     create_table_selection_dishes()
+    create_table_last_messages()
 
     last_message = bot.send_message(
         chat_id=callback.message.chat.id,
