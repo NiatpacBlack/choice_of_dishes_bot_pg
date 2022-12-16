@@ -85,6 +85,13 @@ def add_dish(message) -> Tuple[int, int]:
     return message.chat.id, last_message.id
 
 
+@bot.message_handler(content_types=['text'])
+def handle_text_message(message):
+    """Отлавливает все текстовые сообщения переданные боту и записывает их в таблицу базы данных."""
+
+    pass
+
+
 @bot.callback_query_handler(func=lambda callback: callback.data == "menu")
 @rewrite_last_message
 def callback_menu(callback) -> Tuple[int, int]:
