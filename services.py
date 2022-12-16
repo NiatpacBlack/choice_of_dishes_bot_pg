@@ -6,6 +6,8 @@ from db_services import (
     get_all_categories_data,
     get_all_tables_name_from_db,
     insert_category_in_table_menu_categories,
+    get_category_id_where_category_name,
+    insert_dish_in_dishes_table,
 )
 
 
@@ -87,13 +89,28 @@ def add_dish_in_category(message) -> str:
     Если сообщение не имеет данных о категории или блюде, возвращает текстовую ошибку.
     """
 
-    list_message_words = message.text.split()
-    if 6 > len(list_message_words) >= 2:
-        category_name = ' '.join(list_message_words[1].split('_'))
-        dish_name = ' '.join(list_message_words[2].split('_'))
-        dish_price = ' '.join(list_message_words[3].split('_'))
-        dish_description = ' '.join(list_message_words[4].split('_'))
-        print(category_name, dish_name, dish_price, dish_description)
+    list_message_words = message.text.split()[1:]
+    parameters = {"category": "", "dish": "", "price": "", "description": ""}
+
+    if 5 > len(list_message_words) >= 3:
+        for index, word in enumerate(list_message_words):
+            parameters[list(parameters.keys())[index]] = " ".join(word.split("_"))
+
+        category_id = get_category_id_where_category_name(
+            category_name=parameters["category"]
+        )
+
+        if category_id and parameters["price"].isdigit():
+
+            insert_dish_in_dishes_table(
+                dish_name=parameters["dish"],
+                category_id=str(category_id),
+                price=parameters["price"],
+                description=parameters["description"],
+            )
+
+            return f"Блюдо успешно добавлено в категорию {parameters['category']}."
+
     return "Переданное сообщение на соответствует форме."
 
 
