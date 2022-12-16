@@ -1,19 +1,21 @@
 import os
 import re
+from datetime import datetime
 from typing import Tuple
 
+import pytz as pytz
 from dotenv import load_dotenv
 from telebot import TeleBot
 
 from bot_answers import (
     cb_admin_answer, cb_create_menu_answer, cb_add_category_answer, cb_add_dish_answer, cb_back_to_start_answer,
     cb_menu_answer, add_category_answer, cb_dishes_in_category_answer, cb_back_to_menu_answer,
-    cb_parameters_from_dish_answer,
 )
 from db_services import (
     create_table_menu_categories,
     create_table_dishes,
-    get_all_categories_data, get_dish_parameters,
+    get_all_categories_data, get_dish_parameters, create_table_selection_dishes,
+    add_dish_selection_in_selection_dishes_table,
 )
 from services import (
     get_start_keyboard,
@@ -119,6 +121,8 @@ def callback_create_menu(callback) -> Tuple[int, int]:
 
     create_table_menu_categories()
     create_table_dishes()
+    create_table_selection_dishes()
+
     last_message = bot.send_message(
         chat_id=callback.message.chat.id,
         text=cb_create_menu_answer.answer,
@@ -207,7 +211,14 @@ def callback_dishes_in_category(callback) -> Tuple[int, int]:
 def callback_parameters_from_dish(callback) -> Tuple[int, int]:
     """Отображает пользователю полные данные о блюде, получая его id из коллбека."""
 
-    dish_parameters = get_dish_parameters(dish_id=callback.data.replace('dish_', ''))
+    dish_id = callback.data.replace('dish_', '')
+    dish_parameters = get_dish_parameters(dish_id)
+
+    add_dish_selection_in_selection_dishes_table(
+        user_name=callback.from_user.username,
+        dish_id=dish_id,
+        date=datetime.now(pytz.timezone('Europe/Minsk'))
+    )
 
     last_message = bot.send_message(
         chat_id=callback.message.chat.id,

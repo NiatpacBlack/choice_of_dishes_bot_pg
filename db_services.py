@@ -1,3 +1,4 @@
+from datetime import datetime
 import os
 from pprint import pprint
 from typing import List, Tuple, Optional, Union
@@ -41,6 +42,19 @@ def create_table_dishes() -> None:
        description VARCHAR(255),
           in_stock BOOLEAN NOT NULL DEFAULT TRUE,
        FOREIGN KEY (category_id) REFERENCES menu_categories (category_id) ON DELETE CASCADE""",
+    )
+
+
+def create_table_selection_dishes() -> None:
+    """Создает таблицу selection_dishes, в которой будут храниться данные о нажатии на определенное блюдо из меню."""
+
+    postgres_client.create_table(
+        "selection_dishes",
+        """selection_dishes_id SERIAL PRIMARY KEY,
+                      username VARCHAR(255) NOT NULL,
+                       dish_id INTEGER NOT NULL,
+                       datetime timestamp with time zone NOT NULL,
+                   FOREIGN KEY (dish_id) REFERENCES dishes (dish_id) ON DELETE CASCADE""",
     )
 
 
@@ -121,6 +135,14 @@ def get_dish_parameters(dish_id: str) -> Tuple[int, str, int, Union[int, float],
     )
     postgres_client.cursor.execute(query)
     return postgres_client.cursor.fetchone()
+
+
+def add_dish_selection_in_selection_dishes_table(user_name: str, dish_id: str, date: datetime):
+    """Добавляет данные о пользователе и блюде, которое выбрал пользователь в таблицу selection_dishes."""
+
+    postgres_client.insert_in_table(
+        table_name="selection_dishes", username=user_name, dish_id=dish_id, datetime=date,
+    )
 
 
 if __name__ == "__main__":
