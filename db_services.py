@@ -85,7 +85,7 @@ def get_category_id_where_category_name(category_name: str) -> Optional[int]:
 
 
 def insert_dish_in_dishes_table(
-    dish_name: str, category_id: str, price: str, description: str = None
+        dish_name: str, category_id: str, price: str, description: str = None
 ):
     """Добавляет блюдо в таблицу dishes."""
     try:
@@ -100,6 +100,17 @@ def insert_dish_in_dishes_table(
         raise InvalidSQLType(
             "Передан неверный тип данных. Вероятно в цену передано не число."
         )
+
+
+def get_dishes_from_category_where(category_id: str) -> Optional[Tuple[int, str]]:
+    """Получает данные из таблицы dishes где поле category_id соответствует переданному id."""
+
+    query = (
+        f"SELECT dish_id, name_dish FROM dishes WHERE category_id={category_id}"
+    )
+    postgres_client.cursor.execute(query)
+    result = postgres_client.cursor.fetchall()
+    return result if result else None
 
 
 if __name__ == "__main__":

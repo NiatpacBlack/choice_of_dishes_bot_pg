@@ -1,4 +1,5 @@
 import os
+import re
 from typing import Tuple
 
 from dotenv import load_dotenv
@@ -6,7 +7,7 @@ from telebot import TeleBot
 
 from bot_answers import (
     cb_admin_answer, cb_create_menu_answer, cb_add_category_answer, cb_add_dish_answer, cb_back_to_start_answer,
-    cb_menu_answer, add_category_answer,
+    cb_menu_answer, add_category_answer, cb_dishes_in_category_answer, cb_back_to_menu_answer,
 )
 from db_services import (
     create_table_menu_categories,
@@ -18,7 +19,7 @@ from services import (
     get_menu_keyboard,
     get_admin_keyboard,
     add_category_in_menu,
-    add_dish_in_category, get_nice_categories_format,
+    add_dish_in_category, get_nice_categories_format, get_dishes_keyboard,
 )
 from validators import (
     admin_chat_id_validator, get_menu_validator, )
@@ -168,6 +169,34 @@ def callback_back_to_start(callback) -> Tuple[int, int]:
         chat_id=callback.message.chat.id,
         text=cb_back_to_start_answer.answer,
         reply_markup=get_start_keyboard(),
+    )
+    return callback.message.chat.id, last_message.id
+
+
+@bot.callback_query_handler(func=lambda callback: callback.data == "back_to_menu")
+@rewrite_last_message
+def callback_back_to_menu(callback) -> Tuple[int, int]:
+    """Отправляет пользователю кнопки с категориями меню."""
+
+    last_message = bot.send_message(
+        chat_id=callback.message.chat.id,
+        text=cb_back_to_menu_answer.answer,
+        reply_markup=get_menu_keyboard(),
+    )
+    return callback.message.chat.id, last_message.id
+
+
+@bot.callback_query_handler(func=lambda callback: re.match(r'category_', callback.data))
+@rewrite_last_message
+def callback_dishes_in_category(callback) -> Tuple[int, int]:
+    """Получает id категории из коллбека, и отображает все блюда этой категории."""
+
+    category_id = callback.data.replace('category_', '')
+
+    last_message = bot.send_message(
+        chat_id=callback.message.chat.id,
+        text=cb_dishes_in_category_answer.answer,
+        reply_markup=get_dishes_keyboard(category_id),
     )
     return callback.message.chat.id, last_message.id
 

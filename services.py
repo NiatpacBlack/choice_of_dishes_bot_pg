@@ -7,7 +7,7 @@ from db_services import (
     get_all_tables_name_from_db,
     insert_category_in_table_menu_categories,
     get_category_id_where_category_name,
-    insert_dish_in_dishes_table,
+    insert_dish_in_dishes_table, get_dishes_from_category_where,
 )
 
 
@@ -64,6 +64,26 @@ def get_admin_keyboard():
                 text="Добавить блюдо в категорию", callback_data="add_dish"
             )
         )
+    return keyboard
+
+
+def get_dishes_keyboard(category_id):
+    """Возвращает кнопки соответствующие позициям из конкретной категории меню."""
+
+    keyboard = types.InlineKeyboardMarkup()
+    all_dishes_from_category = get_dishes_from_category_where(category_id)
+
+    keyboard.add(
+        types.InlineKeyboardButton(text="Назад", callback_data="back_to_menu")
+    )
+
+    if all_dishes_from_category:
+        for dish_id, dish_name in all_dishes_from_category:
+            keyboard.add(
+                types.InlineKeyboardButton(
+                    text=dish_name, callback_data="dish_" + str(dish_id)
+                )
+            )
     return keyboard
 
 
