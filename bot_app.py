@@ -1,4 +1,5 @@
 import os
+from typing import Tuple
 
 from dotenv import load_dotenv
 from telebot import TeleBot
@@ -43,7 +44,7 @@ def rewrite_last_message(func):
 
 @bot.message_handler(commands=["start"])
 @rewrite_last_message
-def start(message):
+def start(message) -> Tuple[int, int]:
     last_message = bot.send_message(
         chat_id=message.chat.id,
         text=f"Здравствуйте, {message.from_user.full_name}, выберите действие:",
@@ -54,7 +55,7 @@ def start(message):
 
 @bot.message_handler(commands=["add_category"])
 @rewrite_last_message
-def add_category(message):
+def add_category(message) -> Tuple[int, int]:
     """Добавляет полученное по шаблону название категории в меню."""
 
     result = add_category_in_menu(message)
@@ -68,7 +69,7 @@ def add_category(message):
 
 @bot.message_handler(commands=["add_dish"])
 @rewrite_last_message
-def add_dish(message):
+def add_dish(message) -> Tuple[int, int]:
     """Добавляет полученное по шаблону блюдо в соответствующую категорию меню."""
 
     result = add_dish_in_category(message=message)
@@ -82,7 +83,7 @@ def add_dish(message):
 
 @bot.callback_query_handler(func=lambda callback: callback.data == "menu")
 @rewrite_last_message
-def callback_menu(callback):
+def callback_menu(callback) -> Tuple[int, int]:
     """Выводит категории меню или сообщение об его отсутствии."""
 
     validation_result = get_menu_validator()
@@ -96,7 +97,7 @@ def callback_menu(callback):
 
 @bot.callback_query_handler(func=lambda callback: callback.data == "admin")
 @rewrite_last_message
-def callback_admin(callback):
+def callback_admin(callback) -> Tuple[int, int]:
     """Выводит функционал администратора если id чата соответствует зарегистрированному админскому id."""
 
     validation_result = admin_chat_id_validator(callback.message.chat.id)
@@ -111,7 +112,7 @@ def callback_admin(callback):
 
 @bot.callback_query_handler(func=lambda callback: callback.data == "create_menu")
 @rewrite_last_message
-def callback_create_menu(callback):
+def callback_create_menu(callback) -> Tuple[int, int]:
     """При нажатии кнопки 'Создать меню' создает пустые таблицы для меню в бд и уведомит об этом пользователя."""
 
     create_table_menu_categories()
@@ -125,7 +126,7 @@ def callback_create_menu(callback):
 
 @bot.callback_query_handler(func=lambda callback: callback.data == "add_category")
 @rewrite_last_message
-def callback_add_category(callback):
+def callback_add_category(callback) -> Tuple[int, int]:
     """Сообщает пользователю в ответном сообщении действия, которые нужно сделать, чтобы добавить новую категорию."""
 
     last_message = bot.send_message(
@@ -139,12 +140,13 @@ def callback_add_category(callback):
 
 @bot.callback_query_handler(func=lambda callback: callback.data == "add_dish")
 @rewrite_last_message
-def callback_add_dish(callback):
+def callback_add_dish(callback) -> Tuple[int, int]:
     """
     Сообщает пользователю в ответном сообщении действия, которые нужно сделать, чтобы добавить новое блюдо.
 
     В ответном сообщении присутствуют текущие доступные категории из меню, чтобы пользователь понимал с чем работать.
     """
+
     categories_data = get_all_categories_data()
     categories_text = get_nice_categories_format(categories_data) if categories_data else 'Доступных категорий нет'
 
@@ -159,8 +161,8 @@ def callback_add_dish(callback):
 
 @bot.callback_query_handler(func=lambda callback: callback.data == "back_to_start")
 @rewrite_last_message
-def callback_back_to_start(callback):
-    """Возвращает пользователя на начальное меню."""
+def callback_back_to_start(callback) -> Tuple[int, int]:
+    """Отправляет пользователю кнопки стартового меню."""
 
     last_message = bot.send_message(
         chat_id=callback.message.chat.id,
