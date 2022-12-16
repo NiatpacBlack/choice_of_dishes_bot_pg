@@ -8,18 +8,19 @@ from telebot import TeleBot
 from bot_answers import (
     cb_admin_answer, cb_create_menu_answer, cb_add_category_answer, cb_add_dish_answer, cb_back_to_start_answer,
     cb_menu_answer, add_category_answer, cb_dishes_in_category_answer, cb_back_to_menu_answer,
+    cb_parameters_from_dish_answer,
 )
 from db_services import (
     create_table_menu_categories,
     create_table_dishes,
-    get_all_categories_data,
+    get_all_categories_data, get_dish_parameters,
 )
 from services import (
     get_start_keyboard,
     get_menu_keyboard,
     get_admin_keyboard,
     add_category_in_menu,
-    add_dish_in_category, get_nice_categories_format, get_dishes_keyboard,
+    add_dish_in_category, get_nice_categories_format, get_dishes_keyboard, back_to_dishes_button,
 )
 from validators import (
     admin_chat_id_validator, get_menu_validator, )
@@ -197,6 +198,25 @@ def callback_dishes_in_category(callback) -> Tuple[int, int]:
         chat_id=callback.message.chat.id,
         text=cb_dishes_in_category_answer.answer,
         reply_markup=get_dishes_keyboard(category_id),
+    )
+    return callback.message.chat.id, last_message.id
+
+
+@bot.callback_query_handler(func=lambda callback: re.match(r'dish_', callback.data))
+@rewrite_last_message
+def callback_parameters_from_dish(callback) -> Tuple[int, int]:
+    """Отображает пользователю полные данные о блюде, получая его id из коллбека."""
+
+    dish_parameters = get_dish_parameters(dish_id=callback.data.replace('dish_', ''))
+
+    last_message = bot.send_message(
+        chat_id=callback.message.chat.id,
+        text=f'Подробности о товаре <b>{dish_parameters[1]}</b>:\n\n'
+             f'<b>Цена:</b> {dish_parameters[3]}р.\n\n'
+             f'{"<b>Описание:</b> " + dish_parameters[4] if dish_parameters[4] else ""}\n\n'
+             f'{"Активен" if dish_parameters[5] else "Нет в продаже"}',
+        parse_mode='html',
+        reply_markup=back_to_dishes_button(dish_parameters[2]),
     )
     return callback.message.chat.id, last_message.id
 

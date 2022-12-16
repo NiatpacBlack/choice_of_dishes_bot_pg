@@ -43,7 +43,12 @@ cb_back_to_menu_answer = TrueFalseAnswer(
 
 cb_dishes_in_category_answer = TrueFalseAnswer(
     answer="Выберите блюдо:",
-    false_answer="В данной категории нет блюд для выбора.",
+    false_answer=None,
+)
+
+cb_parameters_from_dish_answer = TrueFalseAnswer(
+    answer="Подробности о товаре",
+    false_answer=None,
 )
 
 add_category_answer = TrueFalseAnswer(

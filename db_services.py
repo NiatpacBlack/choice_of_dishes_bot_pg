@@ -1,6 +1,6 @@
 import os
 from pprint import pprint
-from typing import List, Tuple, Optional
+from typing import List, Tuple, Optional, Union
 
 from dotenv import load_dotenv
 
@@ -103,7 +103,7 @@ def insert_dish_in_dishes_table(
 
 
 def get_dishes_from_category_where(category_id: str) -> Optional[Tuple[int, str]]:
-    """Получает данные из таблицы dishes где поле category_id соответствует переданному id."""
+    """Возвращает кортеж с данными из таблицы dishes, где поле category_id соответствует переданному id."""
 
     query = (
         f"SELECT dish_id, name_dish FROM dishes WHERE category_id={category_id}"
@@ -111,6 +111,16 @@ def get_dishes_from_category_where(category_id: str) -> Optional[Tuple[int, str]
     postgres_client.cursor.execute(query)
     result = postgres_client.cursor.fetchall()
     return result if result else None
+
+
+def get_dish_parameters(dish_id: str) -> Tuple[int, str, int, Union[int, float], str, bool]:
+    """Возвращает информацию о конкретном товаре, id которого совпадает с переданным dish_id."""
+
+    query = (
+        f"SELECT * FROM dishes WHERE dish_id={dish_id}"
+    )
+    postgres_client.cursor.execute(query)
+    return postgres_client.cursor.fetchone()
 
 
 if __name__ == "__main__":

@@ -102,6 +102,15 @@ def add_category_in_menu(message) -> str:
     return "Вы не передали название категории."
 
 
+def back_to_dishes_button(category_id: int):
+    """Возвращает кнопку для перехода блюдам соответствующей категории меню."""
+
+    keyboard = types.InlineKeyboardMarkup()
+    keyboard.add(
+        types.InlineKeyboardButton(text="Назад", callback_data=f"category_{category_id}")
+    )
+    return keyboard
+
 def add_dish_in_category(message) -> Optional[bool]:
     """Добавляет блюдо переданное в сообщении message в соответсвующую категорию меню."""
 
