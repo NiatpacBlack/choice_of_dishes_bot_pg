@@ -1,4 +1,4 @@
-from typing import Tuple, List
+from typing import Tuple, List, Optional, Dict
 
 from telebot import types
 
@@ -82,39 +82,59 @@ def add_category_in_menu(message) -> str:
     return "Вы не передали название категории."
 
 
-def add_dish_in_category(message) -> str:
-    """
-    Достает из полученного сообщения название категории и блюда и добавляет его в соответствующую категорию меню.
+def add_dish_in_category(message) -> Optional[bool]:
+    """Добавляет блюдо переданное в сообщении message в соответсвующую категорию меню."""
 
-    Если сообщение не имеет данных о категории или блюде, возвращает текстовую ошибку.
-    """
+    parameters = _dish_in_category_message_converter(message)
 
-    list_message_words = message.text.split()[1:]
-    parameters = {"category": "", "dish": "", "price": "", "description": ""}
-
-    if 5 > len(list_message_words) >= 3:
-        for index, word in enumerate(list_message_words):
-            parameters[list(parameters.keys())[index]] = " ".join(word.split("_"))
-
-        category_id = get_category_id_where_category_name(
-            category_name=parameters["category"]
+    if parameters:
+        insert_dish_in_dishes_table(
+            dish_name=parameters["dish"],
+            category_id=parameters["category"],
+            price=parameters["price"],
+            description=parameters["description"],
         )
-
-        if category_id and parameters["price"].isdigit():
-
-            insert_dish_in_dishes_table(
-                dish_name=parameters["dish"],
-                category_id=str(category_id),
-                price=parameters["price"],
-                description=parameters["description"],
-            )
-
-            return f"Блюдо успешно добавлено в категорию {parameters['category']}."
-
-    return "Переданное сообщение на соответствует форме."
+        return True
 
 
 def get_nice_categories_format(categories_data: List[Tuple[str, ...]]) -> str:
     """Преобразует список с данными категорий меню в удобочитаемый строчный формат."""
 
     return "\n".join(map(lambda category_data: category_data[1], categories_data))
+
+
+def _dish_in_category_message_converter(message) -> Optional[Dict[str, str]]:
+    """
+    Обрабатывает полученное сообщение с данными о блюде, которое нужно добавить в меню.
+
+    В случае, если блюдо соответствует шаблону корректного ввода, возвращает словарь с данными, подготовленными для
+    добавления в таблицу dish базы данных. В остальных случаях вернет None.
+    """
+
+    list_message_words = message.text.split()[1:]
+    inner_parameters = {"category": "", "dish": "", "price": "", "description": ""}
+    list_parameters_keys = list(inner_parameters.keys())
+
+    if 5 > len(list_message_words) >= 3:
+
+        for index, word in enumerate(list_message_words):
+            inner_parameters[list_parameters_keys[index]] = " ".join(word.split("_"))
+
+        category_id = get_category_id_where_category_name(
+            category_name=inner_parameters["category"]
+        )
+
+        if _price_validator(inner_parameters["price"]) and category_id:
+            inner_parameters["category"] = str(category_id)
+            return inner_parameters
+
+
+def _price_validator(price: str) -> bool:
+    """Проверяет, является ли строка с информацией о цене товара числом и больше 0."""
+
+    price.replace(',', '.')
+    try:
+        float(price)
+        return True
+    except ValueError:
+        return False

@@ -6,7 +6,7 @@ from telebot import TeleBot
 
 from bot_answers import (
     cb_admin_answer, cb_create_menu_answer, cb_add_category_answer, cb_add_dish_answer, cb_back_to_start_answer,
-    cb_menu_answer,
+    cb_menu_answer, add_category_answer,
 )
 from db_services import (
     create_table_menu_categories,
@@ -70,12 +70,12 @@ def add_category(message) -> Tuple[int, int]:
 @bot.message_handler(commands=["add_dish"])
 @rewrite_last_message
 def add_dish(message) -> Tuple[int, int]:
-    """Добавляет полученное по шаблону блюдо в соответствующую категорию меню."""
+    """Пытается добавить переданное блюдо из сообщения в меню. Отправляет пользователю ответ о результате добавления."""
 
     result = add_dish_in_category(message=message)
     last_message = bot.send_message(
         chat_id=message.chat.id,
-        text=result,
+        text=add_category_answer.answer if result else add_category_answer.false_answer,
         reply_markup=get_admin_keyboard(),
     )
     return message.chat.id, last_message.id

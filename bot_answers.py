@@ -7,7 +7,6 @@ cb_menu_answer = TrueFalseAnswer(
     false_answer="К сожалению, меню пока не существует. Создайте его из админ-панели.",
 )
 
-
 cb_admin_answer = TrueFalseAnswer(
     answer="Выберите действие:",
     false_answer="Ваш аккаунт не имеет доступа. Обратитесь к менеджеру заведения.",
@@ -35,4 +34,9 @@ cb_add_dish_answer = TrueFalseAnswer(
 cb_back_to_start_answer = TrueFalseAnswer(
     answer="Выберите действие:",
     false_answer=None,
+)
+
+add_category_answer = TrueFalseAnswer(
+    answer="Блюдо успешно добавлено в категорию.",
+    false_answer="Переданное сообщение на соответствует форме.",
 )
