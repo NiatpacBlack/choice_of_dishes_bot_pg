@@ -21,7 +21,7 @@ from services import (
     add_dish_in_category, get_nice_categories_format,
 )
 from validators import (
-    admin_chat_id_validator, get_menu_validator, )
+    admin_chat_id_validator, get_menu_validator, allowable_lenght_validator, )
 
 load_dotenv()
 bot = TeleBot(os.getenv("BOT_TOKEN"))
@@ -58,11 +58,12 @@ def start(message) -> Tuple[int, int]:
 def add_category(message) -> Tuple[int, int]:
     """Добавляет полученное по шаблону название категории в меню."""
 
-    result = add_category_in_menu(message)
+    validation_result = allowable_lenght_validator(message.text, 60)
+    result = add_category_in_menu(message) if validation_result else cb_add_category_answer.false_answer
     last_message = bot.send_message(
         chat_id=message.chat.id,
         text=result,
-        reply_markup=get_admin_keyboard(),
+        reply_markup=get_admin_keyboard() if validation_result else None,
     )
     return message.chat.id, last_message.id
 

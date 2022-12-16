@@ -20,7 +20,7 @@ cb_create_menu_answer = TrueFalseAnswer(
 
 cb_add_category_answer = TrueFalseAnswer(
     answer="Что-бы добавить категорию отправьте боту сообщение:\n<i>'/add_category название_категории'</i>",
-    false_answer=None,
+    false_answer="Вы превысили максимальное количество символов, максимальное количество - 60",
 )
 
 cb_add_dish_answer = TrueFalseAnswer(
