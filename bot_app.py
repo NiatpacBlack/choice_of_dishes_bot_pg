@@ -250,7 +250,7 @@ def callback_parameters_from_dish(callback) -> Tuple[int, int]:
     dish_parameters = get_dish_parameters(dish_id)
 
     add_dish_selection_in_selection_dishes_table(
-        user_name=callback.from_user.username,
+        user_name=f"{callback.from_user.first_name} {callback.from_user.last_name or ''}",
         dish_id=dish_id,
         date=datetime.now(pytz.timezone("Europe/Minsk")),
     )
@@ -258,9 +258,9 @@ def callback_parameters_from_dish(callback) -> Tuple[int, int]:
     last_message = bot.send_message(
         chat_id=callback.message.chat.id,
         text=f"Подробности о товаре <b>{dish_parameters[1]}</b>:\n\n"
-        f"<b>Цена:</b> {dish_parameters[3]}р.\n\n"
-        f'{"<b>Описание:</b> " + dish_parameters[4] if dish_parameters[4] else ""}\n\n'
-        f'{"Активен" if dish_parameters[5] else "Нет в продаже"}',
+             f"<b>Цена:</b> {dish_parameters[3]}р.\n\n"
+             f'{"<b>Описание:</b> " + dish_parameters[4] if dish_parameters[4] else ""}\n\n'
+             f'{"Активен" if dish_parameters[5] else "Нет в продаже"}',
         parse_mode="html",
         reply_markup=back_to_dishes_button(dish_parameters[2]),
     )
