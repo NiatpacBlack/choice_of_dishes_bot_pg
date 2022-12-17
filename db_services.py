@@ -66,7 +66,7 @@ def create_table_last_messages() -> None:
         """
         last_message_id SERIAL PRIMARY KEY,
            text_message text NOT NULL
-        """
+        """,
     )
 
 
@@ -111,7 +111,7 @@ def get_category_id_where_category_name(category_name: str) -> Optional[int]:
 
 
 def insert_dish_in_dishes_table(
-        dish_name: str, category_id: str, price: str, description: str = None
+    dish_name: str, category_id: str, price: str, description: str = None
 ):
     """Добавляет блюдо в таблицу dishes."""
     try:
@@ -131,29 +131,32 @@ def insert_dish_in_dishes_table(
 def get_dishes_from_category_where(category_id: str) -> Optional[Tuple[int, str]]:
     """Возвращает кортеж с данными из таблицы dishes, где поле category_id соответствует переданному id."""
 
-    query = (
-        f"SELECT dish_id, name_dish FROM dishes WHERE category_id={category_id}"
-    )
+    query = f"SELECT dish_id, name_dish FROM dishes WHERE category_id={category_id}"
     postgres_client.cursor.execute(query)
     result = postgres_client.cursor.fetchall()
     return result if result else None
 
 
-def get_dish_parameters(dish_id: str) -> Tuple[int, str, int, Union[int, float], str, bool]:
+def get_dish_parameters(
+    dish_id: str,
+) -> Tuple[int, str, int, Union[int, float], str, bool]:
     """Возвращает информацию о конкретном товаре, id которого совпадает с переданным dish_id."""
 
-    query = (
-        f"SELECT * FROM dishes WHERE dish_id={dish_id}"
-    )
+    query = f"SELECT * FROM dishes WHERE dish_id={dish_id}"
     postgres_client.cursor.execute(query)
     return postgres_client.cursor.fetchone()
 
 
-def add_dish_selection_in_selection_dishes_table(user_name: str, dish_id: str, date: datetime):
+def add_dish_selection_in_selection_dishes_table(
+    user_name: str, dish_id: str, date: datetime
+):
     """Добавляет данные о пользователе и блюде, которое выбрал пользователь в таблицу selection_dishes."""
 
     postgres_client.insert_in_table(
-        table_name="selection_dishes", username=user_name, dish_id=dish_id, datetime=date,
+        table_name="selection_dishes",
+        username=user_name,
+        dish_id=dish_id,
+        datetime=date,
     )
 
 
@@ -161,19 +164,54 @@ def add_message_in_last_messages_table(message: str) -> None:
     """Добавляет строку message в таблицу last_messages."""
 
     postgres_client.insert_in_table(
-        table_name="last_messages", text_message=message,
+        table_name="last_messages",
+        text_message=message,
     )
 
 
-def get_last_messages(limit: int = 10) -> List[Tuple[str], ...]:
+def get_last_messages(limit: int = 10) -> List[Tuple[str]]:
     """Получает n-ное количество последних сообщений из таблицы last_messages."""
 
-    query = (
-        f"SELECT text_message FROM last_messages ORDER BY last_message_id DESC LIMIT ({limit})"
-    )
+    query = f"SELECT text_message FROM last_messages ORDER BY last_message_id DESC LIMIT ({limit})"
+    postgres_client.cursor.execute(query)
+    return postgres_client.cursor.fetchall()
+
+
+def get_top_dishes_from_selection_dishes_table(limit: int) -> List[Tuple[str, int]]:
+    """
+    Получает n-ное количество названий блюд и количество раз, когда это блюдо было выбрано.
+
+    Данные берутся из выборки количества всех выбранных пользователями блюд.
+    """
+
+    query = f"""
+        SELECT name_dish, count(name_dish) 
+          FROM selection_dishes JOIN dishes USING(dish_id)
+      GROUP BY name_dish
+      ORDER BY count DESC
+         LIMIT {limit}
+        """
+    postgres_client.cursor.execute(query)
+    return postgres_client.cursor.fetchall()
+
+
+def get_top_users_from_selection_dishes_table(limit: int) -> List[Tuple[str, int]]:
+    """
+    Получает n-ное количество ников пользователей и количество блюд, которые они выбирали.
+
+    Данные берутся из выборки количества всех выбранных пользователями блюд.
+    """
+
+    query = f"""
+        SELECT username, count(username) 
+          FROM selection_dishes JOIN dishes USING(dish_id)
+      GROUP BY username
+      ORDER BY count DESC
+         LIMIT {limit}
+        """
     postgres_client.cursor.execute(query)
     return postgres_client.cursor.fetchall()
 
 
 if __name__ == "__main__":
-    print(get_last_messages())
+    print(get_top_dishes_from_selection_dishes_table(3))
