@@ -12,9 +12,9 @@ from bot_answers import (
     cb_add_dish_answer,
     cb_back_to_start_answer,
     cb_menu_answer,
-    add_category_answer,
+    add_dish_answer,
     cb_dishes_in_category_answer,
-    cb_back_to_menu_answer,
+    cb_back_to_menu_answer, add_category_answer,
 )
 from config import BOT_TOKEN
 from db_services import (
@@ -43,7 +43,7 @@ from services import (
 from validators import (
     admin_chat_id_validator,
     get_menu_validator,
-    allowable_length_validator,
+    _allowable_message_length_validator,
 )
 
 bot = TeleBot(BOT_TOKEN)
@@ -67,6 +67,8 @@ def rewrite_last_message(func):
 @bot.message_handler(commands=["start"])
 @rewrite_last_message
 def start(message) -> Tuple[int, int]:
+    """Отображает пользователю приветственное сообщение и начальное меню."""
+
     last_message = bot.send_message(
         chat_id=message.chat.id,
         text=f"Здравствуйте, {message.from_user.full_name}, выберите действие:",
@@ -78,14 +80,13 @@ def start(message) -> Tuple[int, int]:
 @bot.message_handler(commands=["add_category"])
 @rewrite_last_message
 def add_category(message) -> Tuple[int, int]:
-    """Добавляет полученное по шаблону название категории в меню."""
+    """Добавляет полученное из сообщения пользователя название категории в меню."""
 
-    validation_result = allowable_length_validator(message.text, 60)
-    result = add_category_in_menu(message) if validation_result else cb_add_category_answer.false_answer
+    result = add_category_in_menu(message)
     last_message = bot.send_message(
         chat_id=message.chat.id,
-        text=result,
-        reply_markup=get_admin_keyboard() if validation_result else None,
+        text=add_category_answer.answer if result else add_category_answer.false_answer,
+        reply_markup=get_admin_keyboard(),
     )
     return message.chat.id, last_message.id
 
@@ -98,7 +99,7 @@ def add_dish(message) -> Tuple[int, int]:
     result = add_dish_in_category(message=message)
     last_message = bot.send_message(
         chat_id=message.chat.id,
-        text=add_category_answer.answer if result else add_category_answer.false_answer,
+        text=add_dish_answer.answer if result else add_dish_answer.false_answer,
         reply_markup=get_admin_keyboard(),
     )
     return message.chat.id, last_message.id

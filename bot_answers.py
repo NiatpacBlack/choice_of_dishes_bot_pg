@@ -18,8 +18,8 @@ cb_create_menu_answer = TrueFalseAnswer(
 )
 
 cb_add_category_answer = TrueFalseAnswer(
-    answer="Что-бы добавить категорию отправьте боту сообщение:\n<i>'/add_category название_категории'</i>",
-    false_answer="Вы превысили максимальное количество символов, максимальное количество - 60",
+    answer="Что-бы добавить категорию отправьте боту сообщение:\n<i>'/add_category название категории'</i>",
+    false_answer=None,
 )
 
 cb_add_dish_answer = TrueFalseAnswer(
@@ -51,8 +51,12 @@ cb_parameters_from_dish_answer = TrueFalseAnswer(
     false_answer=None,
 )
 
-add_category_answer = TrueFalseAnswer(
+add_dish_answer = TrueFalseAnswer(
     answer="Блюдо успешно добавлено в категорию.",
     false_answer="Переданное сообщение на соответствует форме.",
 )
 
+add_category_answer = TrueFalseAnswer(
+    answer="Категория успешно создана!",
+    false_answer="Вы не передали название категории или ваше название длиннее 60 символов.",
+)

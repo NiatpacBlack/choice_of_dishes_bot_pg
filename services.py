@@ -13,6 +13,7 @@ from db_services import (
     get_top_users_from_selection_dishes_table,
     get_last_messages,
 )
+from validators import add_category_message_validator, price_validator
 
 
 def get_start_keyboard():
@@ -107,19 +108,17 @@ def get_dishes_keyboard(category_id):
     return keyboard
 
 
-def add_category_in_menu(message) -> str:
+def add_category_in_menu(message) -> Optional[bool]:
     """
     Достает из полученного сообщения название категории и добавляет его в таблицу с категориями меню.
 
-    Если сообщение не имеет данных о категории, возвращает текстовую ошибку.
+    В случае успеха добавления категории - вернет True, иначе - вернет None.
     """
 
-    list_message_words = message.text.split()
-    if len(list_message_words) != 1:
-        category_name = " ".join(list_message_words[1:])
+    category_name = _get_category_name_from_message(message)
+    if category_name:
         insert_category_in_table_menu_categories(category_name)
-        return "Категория успешно создана!"
-    return "Вы не передали название категории."
+        return True
 
 
 def back_to_dishes_button(category_id: int):
@@ -176,7 +175,7 @@ def _dish_in_category_message_converter(message) -> Optional[Dict[str, str]]:
             category_name=inner_parameters["category"]
         )
 
-        if _price_validator(inner_parameters["price"]) and category_id:
+        if price_validator(inner_parameters["price"]) and category_id:
             inner_parameters["category"] = str(category_id)
             return inner_parameters
 
@@ -221,12 +220,14 @@ def get_last_messages_report(count: int) -> str:
     return text_report
 
 
-def _price_validator(price: str) -> bool:
-    """Проверяет, является ли строка с информацией о цене товара числом и больше 0."""
+def _get_category_name_from_message(message) -> Optional[str]:
+    """
+    В случае успеха проверки сообщения - находит в переданном сообщении название категории, форматирует и возвращает ее.
 
-    price.replace(",", ".")
-    try:
-        float(price)
-        return True
-    except ValueError:
-        return False
+    В случае несоответствия сообщения шаблону добавления категории в меню - вернет None.
+    """
+
+    if add_category_message_validator(message):
+        category_name = " ".join(message.text.split()[1:])
+        category_name = category_name.replace('_', ' ')
+        return category_name
