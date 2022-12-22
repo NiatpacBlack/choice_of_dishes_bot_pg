@@ -1,11 +1,10 @@
 from unittest import TestCase, main
-from db import PostgresClient
-import os
-from dotenv import load_dotenv
-from exceptions import CantTableError
+
 from psycopg2 import errors
 
-load_dotenv()
+from config import DB_NAME, DB_USER, DB_PASSWORD, DB_HOST
+from db import PostgresClient
+from exceptions import CantTableError
 
 
 class PostgresClientTest(TestCase):
@@ -13,10 +12,10 @@ class PostgresClientTest(TestCase):
 
     def setUp(self):
         self.postgres_client = PostgresClient(
-            dbname=os.getenv("DB_NAME"),
-            user=os.getenv("DB_USER"),
-            password=os.getenv("DB_PASSWORD"),
-            host=os.getenv("DB_HOST"),
+            dbname=DB_NAME,
+            user=DB_USER,
+            password=DB_PASSWORD,
+            host=DB_HOST,
         )
 
         self.postgres_client.create_table(

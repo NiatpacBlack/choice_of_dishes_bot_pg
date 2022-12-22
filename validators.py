@@ -1,7 +1,7 @@
-import os
-from typing import Optional, Tuple, List
+from typing import Optional
 
-from db_services import get_all_tables_name_from_db, get_all_categories_data
+from config import ADMIN_CHAT_ID
+from db_services import get_all_tables_name_from_db
 
 
 def admin_chat_id_validator(chat_id: int) -> Optional[bool]:
@@ -11,7 +11,7 @@ def admin_chat_id_validator(chat_id: int) -> Optional[bool]:
     Список id админов берётся из переменной окружения. По умолчанию используется заглушка.
     """
 
-    admin_chat_id = os.getenv("ADMIN_CHAT_ID") or "0000000000"
+    admin_chat_id = ADMIN_CHAT_ID or "0000000000"
     list_admin_chat_id = admin_chat_id.split()
 
     if str(chat_id) in list_admin_chat_id:
@@ -25,7 +25,8 @@ def get_menu_validator() -> Optional[bool]:
     if ("menu_categories",) in all_tables_in_db:
         return True
 
-def allowable_lenght_validator(message: str, max_lenght: int) -> bool:
+
+def allowable_length_validator(message: str, max_lenght: int) -> bool:
     """
     Проверяет, не превышает ли значение добавляемое в меню, максимальное количество
     символов установленное для полей таблиц в базе данных.

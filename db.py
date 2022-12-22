@@ -1,13 +1,9 @@
-import os
 from typing import List, Tuple
 
 import psycopg2
-from dotenv import load_dotenv
 from psycopg2 import sql, errors
 
 from exceptions import CantTableError
-
-load_dotenv()
 
 
 class PostgresClient:
@@ -40,7 +36,7 @@ class PostgresClient:
         return self.cursor.fetchall()
 
     def select_columns_from_table(
-        self, table_name: str, *args: str
+            self, table_name: str, *args: str
     ) -> List[Tuple[str, ...]]:
         """Возвращает список с кортежами, содержащими данные переданных полей из *args из таблицы table_name."""
 
@@ -99,11 +95,11 @@ class PostgresClient:
         self.db_connect.commit()
 
     def update_table_where(
-        self,
-        table_name: str,
-        set_column: str,
-        set_column_value: str,
-        where_pattern: str,
+            self,
+            table_name: str,
+            set_column: str,
+            set_column_value: str,
+            where_pattern: str,
     ) -> None:
         """
         Обновляет колонку переданную в set_column данными, переданными в set_column_value,
@@ -141,12 +137,3 @@ class PostgresClient:
         )
         self.cursor.execute(query)
         self.db_connect.commit()
-
-
-if __name__ == "__main__":
-    my_postgres_db = PostgresClient(
-        dbname=os.getenv("DB_NAME"),
-        user=os.getenv("DB_USER"),
-        password=os.getenv("DB_PASSWORD"),
-        host=os.getenv("DB_HOST"),
-    )

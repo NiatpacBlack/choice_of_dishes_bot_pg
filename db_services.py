@@ -1,19 +1,15 @@
 from datetime import datetime
-import os
-from pprint import pprint
 from typing import List, Tuple, Optional, Union
 
-from dotenv import load_dotenv
-
+from config import DB_NAME, DB_USER, DB_PASSWORD, DB_HOST
 from db import PostgresClient, errors
 from exceptions import InvalidSQLType
 
-load_dotenv()
 postgres_client = PostgresClient(
-    dbname=os.getenv("DB_NAME"),
-    user=os.getenv("DB_USER"),
-    password=os.getenv("DB_PASSWORD"),
-    host=os.getenv("DB_HOST"),
+    dbname=DB_NAME,
+    user=DB_USER,
+    password=DB_PASSWORD,
+    host=DB_HOST,
 )
 
 
@@ -111,7 +107,7 @@ def get_category_id_where_category_name(category_name: str) -> Optional[int]:
 
 
 def insert_dish_in_dishes_table(
-    dish_name: str, category_id: str, price: str, description: str = None
+        dish_name: str, category_id: str, price: str, description: str = None
 ):
     """Добавляет блюдо в таблицу dishes."""
     try:
@@ -138,7 +134,7 @@ def get_dishes_from_category_where(category_id: str) -> Optional[Tuple[int, str]
 
 
 def get_dish_parameters(
-    dish_id: str,
+        dish_id: str,
 ) -> Tuple[int, str, int, Union[int, float], str, bool]:
     """Возвращает информацию о конкретном товаре, id которого совпадает с переданным dish_id."""
 
@@ -148,7 +144,7 @@ def get_dish_parameters(
 
 
 def add_dish_selection_in_selection_dishes_table(
-    user_name: str, dish_id: str, date: datetime
+        user_name: str, dish_id: str, date: datetime
 ):
     """Добавляет данные о пользователе и блюде, которое выбрал пользователь в таблицу selection_dishes."""
 
