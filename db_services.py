@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List, Tuple, Optional, Union
+from typing import List, Tuple, Optional, Dict, Any
 
 import pytz
 
@@ -136,14 +136,21 @@ def get_dishes_from_category_where(category_id: str) -> Optional[Tuple[int, str]
     return result if result else None
 
 
-def get_dish_parameters(
-        dish_id: str,
-) -> Tuple[int, str, int, Union[int, float], str, bool]:
-    """Возвращает информацию о конкретном товаре, id которого совпадает с переданным dish_id."""
+def get_dish_parameters(dish_id: str) -> Dict[str, Any]:
+    """Возвращает словарь с информацией о конкретном товаре, id которого совпадает с переданным dish_id."""
 
     query = f"SELECT * FROM dishes WHERE dish_id={dish_id}"
     postgres_client.cursor.execute(query)
-    return postgres_client.cursor.fetchone()
+    cursor_data = postgres_client.cursor.fetchone()
+
+    return {
+        "id": cursor_data[0],
+        "dish_name": cursor_data[1],
+        "category_id": cursor_data[2],
+        "price": cursor_data[3],
+        "description": cursor_data[4],
+        "is_active": cursor_data[5],
+    }
 
 
 def add_dish_selection_in_selection_dishes_table(

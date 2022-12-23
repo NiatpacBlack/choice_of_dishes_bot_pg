@@ -235,7 +235,11 @@ def callback_dishes_in_category(callback) -> Tuple[int, int]:
 @bot.callback_query_handler(func=lambda callback: re.match(r"dish_", callback.data))
 @rewrite_last_message
 def callback_parameters_from_dish(callback) -> Tuple[int, int]:
-    """Отображает пользователю полные данные о блюде, получая его id из коллбека."""
+    """
+    Отображает пользователю полные данные о блюде, получая его id из коллбека.
+
+    Записывает данные о нажатии в таблицу для статистики.
+    """
 
     dish_id = callback.data.replace("dish_", "")
 
@@ -245,12 +249,12 @@ def callback_parameters_from_dish(callback) -> Tuple[int, int]:
 
     last_message = bot.send_message(
         chat_id=callback.message.chat.id,
-        text=f"Подробности о товаре <b>{dish_parameters[1]}</b>:\n\n"
-             f"<b>Цена:</b> {dish_parameters[3]}р.\n\n"
-             f'{"<b>Описание:</b> " + dish_parameters[4] if dish_parameters[4] else ""}\n\n'
-             f'{"Активен" if dish_parameters[5] else "Нет в продаже"}',
+        text=f"Подробности о товаре <b>{dish_parameters['dish_name']}</b>:\n\n"
+             f"<b>Цена:</b> {dish_parameters['price']}р.\n\n"
+             f"{'<b>Описание:</b> ' + dish_parameters['description']}\n\n"
+             f"{'Активен' if dish_parameters['is_active'] else 'Нет в продаже'}",
         parse_mode="html",
-        reply_markup=back_to_dishes_button(dish_parameters[2]),
+        reply_markup=back_to_dishes_button(dish_parameters['category_id']),
     )
     return callback.message.chat.id, last_message.id
 
