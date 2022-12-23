@@ -251,7 +251,7 @@ def callback_parameters_from_dish(callback) -> Tuple[int, int]:
         chat_id=callback.message.chat.id,
         text=f"Подробности о товаре <b>{dish_parameters['dish_name']}</b>:\n\n"
              f"<b>Цена:</b> {dish_parameters['price']}р.\n\n"
-             f"{'<b>Описание:</b> ' + dish_parameters['description']}\n\n"
+             f"<b>Описание:</b> {dish_parameters['description']}\n\n"
              f"{'Активен' if dish_parameters['is_active'] else 'Нет в продаже'}",
         parse_mode="html",
         reply_markup=back_to_dishes_button(dish_parameters['category_id']),
