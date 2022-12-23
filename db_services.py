@@ -1,6 +1,8 @@
 from datetime import datetime
 from typing import List, Tuple, Optional, Union
 
+import pytz
+
 from config import DB_NAME, DB_USER, DB_PASSWORD, DB_HOST
 from db import PostgresClient, errors
 from exceptions import InvalidSQLType
@@ -145,7 +147,7 @@ def get_dish_parameters(
 
 
 def add_dish_selection_in_selection_dishes_table(
-        user_name: str, dish_id: str, date: 'datetime.datetime'
+        user_name: str, dish_id: str
 ):
     """Добавляет данные о пользователе и блюде, которое выбрал пользователь в таблицу selection_dishes."""
 
@@ -153,7 +155,7 @@ def add_dish_selection_in_selection_dishes_table(
         table_name="selection_dishes",
         username=user_name,
         dish_id=dish_id,
-        datetime=date,
+        datetime=str(datetime.now(pytz.timezone("Europe/Minsk"))),
     )
 
 

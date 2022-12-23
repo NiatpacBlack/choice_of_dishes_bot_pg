@@ -1,8 +1,6 @@
 import re
-from datetime import datetime
 from typing import Tuple
 
-import pytz as pytz
 from telebot import TeleBot
 
 from bot_answers import (
@@ -80,7 +78,7 @@ def start(message) -> Tuple[int, int]:
 @bot.message_handler(commands=["add_category"])
 @rewrite_last_message
 def add_category(message) -> Tuple[int, int]:
-    """Добавляет полученное из сообщения пользователя название категории в меню."""
+    """Отправляет пользователю ответ о результате добавления категории в меню."""
 
     result = add_category_in_menu(message)
     last_message = bot.send_message(
@@ -94,7 +92,7 @@ def add_category(message) -> Tuple[int, int]:
 @bot.message_handler(commands=["add_dish"])
 @rewrite_last_message
 def add_dish(message) -> Tuple[int, int]:
-    """Пытается добавить переданное блюдо из сообщения в меню. Отправляет пользователю ответ о результате добавления."""
+    """Отправляет пользователю ответ о результате добавления блюда в меню."""
 
     result = add_dish_in_category(message=message)
     last_message = bot.send_message(
@@ -115,7 +113,7 @@ def handle_text_message(message) -> None:
 @bot.callback_query_handler(func=lambda callback: callback.data == "menu")
 @rewrite_last_message
 def callback_menu(callback) -> Tuple[int, int]:
-    """Выводит категории меню или сообщение об его отсутствии."""
+    """Выводит кнопки категорий меню или сообщение об его отсутствии."""
 
     validation_result = get_menu_validator()
     last_message = bot.send_message(
@@ -129,7 +127,7 @@ def callback_menu(callback) -> Tuple[int, int]:
 @bot.callback_query_handler(func=lambda callback: callback.data == "admin")
 @rewrite_last_message
 def callback_admin(callback) -> Tuple[int, int]:
-    """Выводит функционал администратора если id чата соответствует зарегистрированному админскому id."""
+    """Выводит кнопки с функционалом администратора если id чата соответствует зарегистрированному админскому id."""
 
     validation_result = admin_chat_id_validator(callback.message.chat.id)
 
@@ -182,7 +180,7 @@ def callback_add_dish(callback) -> Tuple[int, int]:
     """
 
     categories_data = get_all_categories_data()
-    categories_text = get_nice_categories_format(categories_data) if categories_data else "Доступных категорий нет"
+    categories_text = get_nice_categories_format(categories_data)
 
     last_message = bot.send_message(
         chat_id=callback.message.chat.id,
@@ -240,13 +238,10 @@ def callback_parameters_from_dish(callback) -> Tuple[int, int]:
     """Отображает пользователю полные данные о блюде, получая его id из коллбека."""
 
     dish_id = callback.data.replace("dish_", "")
-    dish_parameters = get_dish_parameters(dish_id)
 
-    add_dish_selection_in_selection_dishes_table(
-        user_name=f"{callback.from_user.first_name} {callback.from_user.last_name or ''}",
-        dish_id=dish_id,
-        date=datetime.now(pytz.timezone("Europe/Minsk")),
-    )
+    add_dish_selection_in_selection_dishes_table(user_name=f"{callback.from_user.full_name}", dish_id=dish_id)
+
+    dish_parameters = get_dish_parameters(dish_id)
 
     last_message = bot.send_message(
         chat_id=callback.message.chat.id,
