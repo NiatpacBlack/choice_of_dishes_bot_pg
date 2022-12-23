@@ -1,5 +1,6 @@
 from collections import namedtuple
 
+
 TrueFalseAnswer = namedtuple('TrueFalseAnswer', 'answer false_answer')
 
 cb_menu_answer = TrueFalseAnswer(

@@ -14,6 +14,8 @@ from bot_answers import (
     cb_dishes_in_category_answer,
     cb_back_to_menu_answer, add_category_answer,
 )
+from bot_keyboards import get_start_keyboard, get_admin_keyboard, get_menu_keyboard, get_dishes_keyboard, \
+    back_to_dishes_button
 from config import BOT_TOKEN
 from db_services import (
     create_table_menu_categories,
@@ -26,14 +28,9 @@ from db_services import (
     add_message_in_last_messages_table,
 )
 from services import (
-    get_start_keyboard,
-    get_menu_keyboard,
-    get_admin_keyboard,
     add_category_in_menu,
     add_dish_in_category,
     get_nice_categories_format,
-    get_dishes_keyboard,
-    back_to_dishes_button,
     get_most_popular_dishes_report,
     get_most_popular_users_report,
     get_last_messages_report,
