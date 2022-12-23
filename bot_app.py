@@ -43,8 +43,8 @@ from services import (
 from validators import (
     admin_chat_id_validator,
     get_menu_validator,
-    _allowable_message_length_validator,
 )
+
 
 bot = TeleBot(BOT_TOKEN)
 last_message_data = []
@@ -120,9 +120,7 @@ def callback_menu(callback) -> Tuple[int, int]:
     validation_result = get_menu_validator()
     last_message = bot.send_message(
         chat_id=callback.message.chat.id,
-        text=cb_menu_answer.answer
-        if validation_result
-        else cb_menu_answer.false_answer,
+        text=cb_menu_answer.answer if validation_result else cb_menu_answer.false_answer,
         reply_markup=get_menu_keyboard() if validation_result else None,
     )
     return callback.message.chat.id, last_message.id
@@ -137,9 +135,7 @@ def callback_admin(callback) -> Tuple[int, int]:
 
     last_message = bot.send_message(
         chat_id=callback.message.chat.id,
-        text=cb_admin_answer.answer
-        if validation_result
-        else cb_admin_answer.false_answer,
+        text=cb_admin_answer.answer if validation_result else cb_admin_answer.false_answer,
         reply_markup=get_admin_keyboard() if validation_result else None,
     )
     return callback.message.chat.id, last_message.id
@@ -186,11 +182,7 @@ def callback_add_dish(callback) -> Tuple[int, int]:
     """
 
     categories_data = get_all_categories_data()
-    categories_text = (
-        get_nice_categories_format(categories_data)
-        if categories_data
-        else "Доступных категорий нет"
-    )
+    categories_text = get_nice_categories_format(categories_data) if categories_data else "Доступных категорий нет"
 
     last_message = bot.send_message(
         chat_id=callback.message.chat.id,
