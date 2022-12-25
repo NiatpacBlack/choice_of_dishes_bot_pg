@@ -1,7 +1,7 @@
 from collections import namedtuple
 
 
-TrueFalseAnswer = namedtuple('TrueFalseAnswer', 'answer false_answer')
+TrueFalseAnswer = namedtuple("TrueFalseAnswer", "answer false_answer")
 
 cb_menu_answer = TrueFalseAnswer(
     answer="Выберите категорию меню:",
@@ -25,10 +25,10 @@ cb_add_category_answer = TrueFalseAnswer(
 
 cb_add_dish_answer = TrueFalseAnswer(
     answer=f"Что-бы добавить блюдо в категорию отправьте боту сообщение:"
-           f"\n<i>'/add_dish название_категории название_блюда цена описание</i>'"
-           f"\n\n<b>Обратите внимание, что название категории или блюда нужно писать через нижнее подчеркивание"
-           f" вместо пробела, иначе блюдо не будет добавлено!</b>"
-           f"\n\nСписок доступных категорий:\n",
+    f"\n<i>'/add_dish название_категории название_блюда цена описание</i>'"
+    f"\n\n<b>Обратите внимание, что название категории или блюда нужно писать через нижнее подчеркивание"
+    f" вместо пробела, иначе блюдо не будет добавлено!</b>"
+    f"\n\nСписок доступных категорий:\n",
     false_answer=None,
 )
 

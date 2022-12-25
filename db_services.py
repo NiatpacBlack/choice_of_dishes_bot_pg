@@ -110,7 +110,7 @@ def get_category_id_where_category_name(category_name: str) -> Optional[int]:
 
 
 def insert_dish_in_dishes_table(
-        dish_name: str, category_id: str, price: str, description: str = None
+    dish_name: str, category_id: str, price: str, description: str = None
 ):
     """Добавляет блюдо в таблицу dishes."""
     try:
@@ -153,9 +153,7 @@ def get_dish_parameters(dish_id: str) -> Dict[str, Any]:
     }
 
 
-def add_dish_selection_in_selection_dishes_table(
-        user_name: str, dish_id: str
-):
+def add_dish_selection_in_selection_dishes_table(user_name: str, dish_id: str):
     """Добавляет данные о пользователе и блюде, которое выбрал пользователь в таблицу selection_dishes."""
 
     postgres_client.insert_in_table(

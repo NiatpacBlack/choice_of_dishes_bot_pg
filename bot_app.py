@@ -1,5 +1,5 @@
 import re
-from typing import Tuple
+from typing import Tuple, Optional
 
 from telebot import TeleBot, apihelper
 
@@ -12,11 +12,17 @@ from bot_answers import (
     cb_menu_answer,
     add_dish_answer,
     cb_dishes_in_category_answer,
-    cb_back_to_menu_answer, add_category_answer,
+    cb_back_to_menu_answer,
+    add_category_answer,
 )
-from bot_keyboards import get_start_keyboard, get_admin_keyboard, get_menu_keyboard, get_dishes_keyboard, \
-    back_to_dishes_button
-from config import BOT_TOKEN
+from bot_keyboards import (
+    get_start_keyboard,
+    get_admin_keyboard,
+    get_menu_keyboard,
+    get_dishes_keyboard,
+    back_to_dishes_button,
+)
+from config import BOT_TOKEN, ADMIN_CHAT_ID
 from db_services import (
     create_table_menu_categories,
     create_table_dishes,
@@ -35,10 +41,7 @@ from services import (
     get_most_popular_users_report,
     get_last_messages_report,
 )
-from validators import (
-    admin_chat_id_validator,
-    get_menu_validator,
-)
+from validators import get_menu_validator
 
 
 bot = TeleBot(BOT_TOKEN)
@@ -62,6 +65,36 @@ def rewrite_last_message(func):
     return wrapper
 
 
+def admin_chat_id_validator(func):
+    """
+    Декоратор, который проверяет полученный chat_id на соответствие аккаунту администратора.
+
+    Выполняет переданную функцию в случае, если она запущена из чата администратора, в противном случае отправляет
+    сообщение об отсутствии прав у пользователя.
+    Список id админов берётся из переменной окружения. По умолчанию используется заглушка.
+    """
+
+    def wrapper(message) -> Optional[Tuple[int, int]]:
+        admin_chat_id = ADMIN_CHAT_ID or "0000000000"
+        list_admin_chat_id = admin_chat_id.split()
+        try:
+            message_chat_id = message.message.chat.id
+        except AttributeError:
+            message_chat_id = message.chat.id
+
+        if str(message_chat_id) in list_admin_chat_id:
+            func(message)
+            return None
+        last_message = bot.send_message(
+            chat_id=message_chat_id,
+            text="У вашего аккаунта нет прав администратора. Обратитесь к менеджеру заведения.",
+            reply_markup=get_start_keyboard(),
+        )
+        return message_chat_id, last_message.id
+
+    return wrapper
+
+
 @bot.message_handler(commands=["start"])
 @rewrite_last_message
 def start(message) -> Tuple[int, int]:
@@ -77,6 +110,7 @@ def start(message) -> Tuple[int, int]:
 
 @bot.message_handler(commands=["add_category"])
 @rewrite_last_message
+@admin_chat_id_validator
 def add_category(message) -> Tuple[int, int]:
     """Отправляет пользователю ответ о результате добавления категории в меню."""
 
@@ -91,6 +125,7 @@ def add_category(message) -> Tuple[int, int]:
 
 @bot.message_handler(commands=["add_dish"])
 @rewrite_last_message
+@admin_chat_id_validator
 def add_dish(message) -> Tuple[int, int]:
     """Отправляет пользователю ответ о результате добавления блюда в меню."""
 
@@ -118,7 +153,9 @@ def callback_menu(callback) -> Tuple[int, int]:
     validation_result = get_menu_validator()
     last_message = bot.send_message(
         chat_id=callback.message.chat.id,
-        text=cb_menu_answer.answer if validation_result else cb_menu_answer.false_answer,
+        text=cb_menu_answer.answer
+        if validation_result
+        else cb_menu_answer.false_answer,
         reply_markup=get_menu_keyboard() if validation_result else None,
     )
     return callback.message.chat.id, last_message.id
@@ -126,15 +163,14 @@ def callback_menu(callback) -> Tuple[int, int]:
 
 @bot.callback_query_handler(func=lambda callback: callback.data == "admin")
 @rewrite_last_message
+@admin_chat_id_validator
 def callback_admin(callback) -> Tuple[int, int]:
     """Выводит кнопки с функционалом администратора если id чата соответствует зарегистрированному админскому id."""
 
-    validation_result = admin_chat_id_validator(callback.message.chat.id)
-
     last_message = bot.send_message(
         chat_id=callback.message.chat.id,
-        text=cb_admin_answer.answer if validation_result else cb_admin_answer.false_answer,
-        reply_markup=get_admin_keyboard() if validation_result else None,
+        text=cb_admin_answer.answer,
+        reply_markup=get_admin_keyboard(),
     )
     return callback.message.chat.id, last_message.id
 
@@ -243,18 +279,20 @@ def callback_parameters_from_dish(callback) -> Tuple[int, int]:
 
     dish_id = callback.data.replace("dish_", "")
 
-    add_dish_selection_in_selection_dishes_table(user_name=f"{callback.from_user.full_name}", dish_id=dish_id)
+    add_dish_selection_in_selection_dishes_table(
+        user_name=f"{callback.from_user.full_name}", dish_id=dish_id
+    )
 
     dish_parameters = get_dish_parameters(dish_id)
 
     last_message = bot.send_message(
         chat_id=callback.message.chat.id,
         text=f"Подробности о товаре <b>{dish_parameters['dish_name']}</b>:\n\n"
-             f"<b>Цена:</b> {dish_parameters['price']}р.\n\n"
-             f"<b>Описание:</b> {dish_parameters['description']}\n\n"
-             f"{'Активен' if dish_parameters['is_active'] else 'Нет в продаже'}",
+        f"<b>Цена:</b> {dish_parameters['price']}р.\n\n"
+        f"<b>Описание:</b> {dish_parameters['description']}\n\n"
+        f"{'Активен' if dish_parameters['is_active'] else 'Нет в продаже'}",
         parse_mode="html",
-        reply_markup=back_to_dishes_button(dish_parameters['category_id']),
+        reply_markup=back_to_dishes_button(dish_parameters["category_id"]),
     )
     return callback.message.chat.id, last_message.id
 

@@ -1,6 +1,10 @@
 from telebot import types
 
-from db_services import get_all_categories_data, get_all_tables_name_from_db, get_dishes_from_category_where
+from db_services import (
+    get_all_categories_data,
+    get_all_tables_name_from_db,
+    get_dishes_from_category_where,
+)
 
 
 def get_start_keyboard():

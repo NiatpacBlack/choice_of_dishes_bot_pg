@@ -122,5 +122,5 @@ def _get_category_name_from_message(message) -> Optional[str]:
 
     if add_category_message_validator(message):
         category_name = " ".join(message.text.split()[1:])
-        category_name = category_name.replace('_', ' ')
+        category_name = category_name.replace("_", " ")
         return category_name
