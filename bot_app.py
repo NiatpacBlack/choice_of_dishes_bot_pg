@@ -1,7 +1,7 @@
 import re
 from typing import Tuple
 
-from telebot import TeleBot
+from telebot import TeleBot, apihelper
 
 from bot_answers import (
     cb_admin_answer,
@@ -51,8 +51,11 @@ def rewrite_last_message(func):
     def wrapper(*args, **kwargs):
         global last_message_data
 
-        if last_message_data:
-            bot.delete_message(*last_message_data)
+        try:
+            if last_message_data:
+                bot.delete_message(*last_message_data)
+        except apihelper.ApiTelegramException:
+            pass
 
         last_message_data = func(*args, **kwargs)
 
